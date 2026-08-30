@@ -1,0 +1,92 @@
+% =====================================================================
+%  ARTICULO PRELIMINAR - ETAPA 1
+%  Inteligencia Artificial - TEC - Track A
+%
+%  >>> ESTE ARCHIVO NO SE EDITA SALVO ACUERDO DE LOS TRES <<<
+%  Cada quien trabaja unicamente en su archivo de secciones/
+% =====================================================================
+
+\documentclass[conference]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{titlesec}
+\usepackage{cite}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{array}
+
+\titlespacing*{\subsection}{0pt}{1.5ex}{1ex}
+
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+\begin{document}
+
+\makeatletter
+\def\@IEEEaftertitletext{\vspace{-0.6cm}}
+\makeatother
+
+\newcommand{\titlepaper}{Prediction of Winning Probability and Ranking
+Generation in Horse Racing Using Machine Learning on Pre-Race Data}
+
+\title{\titlepaper}
+
+\renewcommand\IEEEkeywordsname{Palabras clave}
+
+% --- AUTORES: cada quien pone SUS datos reales ---
+\author{\IEEEauthorblockN{1\textsuperscript{st} Apellido1, Nombre1}
+\IEEEauthorblockA{\textit{Ingenieria en Computacion} \\
+\textit{Instituto Tecnologico de Costa Rica}\\
+Cartago, Costa Rica \\
+correo1@estudiantec.cr}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Apellido2, Nombre2}
+\IEEEauthorblockA{\textit{Ingenieria en Computacion} \\
+\textit{Instituto Tecnologico de Costa Rica}\\
+Cartago, Costa Rica \\
+correo2@estudiantec.cr}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Apellido3, Nombre3}
+\IEEEauthorblockA{\textit{Ingenieria en Computacion} \\
+\textit{Instituto Tecnologico de Costa Rica}\\
+Cartago, Costa Rica \\
+correo3@estudiantec.cr}
+}
+
+\markboth{Apellido1 et al., \titlepaper}{}
+
+\IEEEtitleabstractindextext{%
+\input{secciones/00-abstract}
+}
+
+\maketitle
+
+\IEEEdisplaynontitleabstractindextext
+\vspace{-1em}
+\IEEEpeerreviewmaketitle
+
+% =====================================================================
+\input{secciones/01-introduction}           % Integrante 1
+\input{secciones/02-case-of-study}          % Integrante 1
+\input{secciones/03-related-projects}       % contenedor de los 3 ejes
+\input{secciones/04-literature-baseline}    % Integrante 3
+\input{secciones/05-proposed-methodology}   % Integrante 2
+\input{secciones/06-technical-analysis}     % Integrante 3
+\input{secciones/07-ethical-considerations} % Integrante 3
+\input{secciones/08-ai-disclosure}          % conjunto
+% =====================================================================
+
+% =====================================================================
+%  BIBLIOGRAFIA (BibTeX)
+%  Si una cita sale como [?]: compile de nuevo, o borre main.aux y
+%  main.bbl y vuelva a compilar.
+% =====================================================================
+\bibliographystyle{IEEEtran}
+\bibliography{referencias}
+
+\end{document}

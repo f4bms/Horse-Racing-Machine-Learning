@@ -1,0 +1,41 @@
+% =====================================================================
+% TABLA COMPARATIVA  ---  COMPARTIDA (cada quien llena SUS filas)
+% Rubrica: obligatoria. Columnas fijas segun el enunciado.
+% FORMATO ACORDADO: metricas en % con un decimal; datasets abreviados.
+% Agregar filas AL FINAL del bloque del eje propio.
+% =====================================================================
+\begin{table*}[!t]
+\centering
+\caption{Comparison of Related Work}
+\label{tab:comparativa}
+\scriptsize
+\renewcommand{\arraystretch}{1.25}
+\begin{tabular}{@{}p{0.7cm} p{0.6cm} p{2.6cm} p{2.8cm} p{2.1cm} p{1.5cm} p{3.7cm}@{}}
+\toprule
+\textbf{Ref.} & \textbf{Ano} & \textbf{Tecnica} & \textbf{Dataset / entorno} &
+\textbf{Metrica principal} & \textbf{Resultado} & \textbf{Limitacion identificada} \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Eje A --- dominio (Int. 1)}} \\
+\midrule
+% ---------- FILAS INTEGRANTE 1 ----------
+% <- agregar filas aqui
+\midrule
+\multicolumn{7}{@{}l}{\textit{Eje B --- tecnicas (Int. 2)}} \\
+\midrule
+% ---------- FILAS INTEGRANTE 2 ----------
+% <- agregar filas aqui
+\midrule
+\multicolumn{7}{@{}l}{\textit{Eje C --- dataset (Int. 3)}} \\
+\midrule
+% ---------- FILAS INTEGRANTE 3 ----------
+% <- agregar filas aqui
+\bottomrule
+\end{tabular}
+\end{table*}
+
+% Formato de fila (copiar y rellenar):
+% \cite{clave} & 2022 & Tecnica & Dataset & Metrica & 27.4\,\% & Limitacion \\
+
+% NOTA: los articulos teoricos o de revision que no reportan resultado
+% experimental NO van en la tabla; se discuten en el texto y se explica
+% en una linea por que quedan fuera.

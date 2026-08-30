@@ -1,0 +1,33 @@
+% =====================================================================
+% TECHNICAL ANALYSIS (TRACK A)  ---  RESPONSABLE: INTEGRANTE 3
+% Rubrica: 5 pts analisis + 3 pts riesgo metodologico (leakage).
+% Acompanado del notebook notebooks/eda.ipynb
+% =====================================================================
+\section{Technical Analysis}
+\label{sec:analysis}
+
+\subsection{Data Dictionary}
+% TODO Int.3: cada columna, tipo, significado, rango, % de nulos.
+
+\subsection{Data Leakage Audit}
+% TODO Int.3 - LA PARTE CRITICA (-15 pts si hay leakage confirmado):
+%  - Clasificar cada columna en PRE-carrera vs POST-carrera.
+%  - Descartar posicion final, tiempo, premio, cuota de cierre.
+%  - Lista explicita de columnas descartadas CON SU RAZON.
+%  - Las features de historial solo pueden usar carreras ANTERIORES
+%    en fecha a la fila actual.
+
+\subsection{Data Quality and Imputation}
+% TODO Int.3: que falta, por que falta, que estrategia y POR QUE.
+% "Imputar con la mediana" sin razon = -5 pts.
+
+\subsection{Outlier Detection}
+% TODO Int.3: pesos, edades o tiempos imposibles. Corregir o eliminar?
+
+\subsection{Class Imbalance}
+% TODO Int.3: cuantificarlo (un ganador por carrera, campos de 8-16 ->
+% 6-12 % de positivos). Discutir class weights y por que SMOTE rompe
+% la estructura de grupo de la carrera.
+
+\subsection{Distributions and Correlations}
+% TODO Int.3: figuras legibles, con pie de figura y referencia en texto.
