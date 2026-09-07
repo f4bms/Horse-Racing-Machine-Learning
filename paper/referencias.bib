@@ -1,10 +1,10 @@
 % =====================================================================
 %  BIBLIOGRAFIA - BibTeX  (obligatorio segun el enunciado)
 %
-%  OJO: BibTeX NO respeta el % como comentario. Si escribe un
-%  @article{...} "comentado", igual lo intenta leer y da error.
-%  Las plantillas de abajo usan AT-article en vez de @article
-%  justamente para evitarlo: al copiarlas, cambie AT- por @.
+%  OJO: BibTeX NO respeta el % como comentario. Si escribe una entrada
+%  "AT-article{...}" escrito con arroba de verdad, igual lo intenta
+%  leer y da error. Por eso las plantillas de abajo escriben AT-article
+%  en lugar de la arroba: al copiarlas, cambie AT- por la arroba.
 %
 %  REGLAS PARA NO PISARSE:
 %   1. Cada quien agrega SOLO dentro de su bloque, AL FINAL del bloque.
@@ -12,7 +12,7 @@
 %        ejeA_smith2022 / ejeB_chen2021 / ejeC_tanaka2019
 %   3. No reordenar ni reformatear entradas ajenas.
 %
-%  PLANTILLAS (copiar y cambiar AT- por @):
+%  PLANTILLAS (copiar y cambiar AT- por la arroba):
 %
 %  AT-article{ejeA_apellido2022,
 %    author  = {Apellido, Nombre and Otro, Autor},
@@ -40,6 +40,24 @@
 % ================  EJE A - DOMINIO  (INTEGRANTE 1)  ==================
 % =====================================================================
 
+% Capitulo clasico sobre modelado de carreras y eficiencia del mercado
+% de apuestas. Sostiene el argumento de la Seccion VI-B: por que las
+% cuotas de cierre se usan como baseline externo y no como feature.
+% NO cuenta para el minimo de 7 articulos arbitrados por integrante,
+% porque es capitulo de libro, no articulo de revista ni conferencia.
+% VERIFICAR capitulo y paginas en la edicion que consulten: el texto
+% original es de 1994 y lo que se cita normalmente es la reimpresion
+% de World Scientific.
+@incollection{ejeA_benter2008,
+  author    = {Benter, William},
+  title     = {Computer Based Horse Race Handicapping and Wagering Systems: A Report},
+  booktitle = {Efficiency of Racetrack Betting Markets},
+  editor    = {Hausch, Donald B. and Lo, Victor S. Y. and Ziemba, William T.},
+  publisher = {World Scientific},
+  pages     = {183--198},
+  year      = {2008}
+}
+
 % <- Int. 1 agrega aqui
 
 
@@ -62,5 +80,17 @@
 % =====================================================================
 % ================  EJE C - DATASET  (INTEGRANTE 3)  ==================
 % =====================================================================
+
+% Cita del dataset. Licencia CC0 1.0 (dominio publico), verificada en
+% Kaggle. NO cuenta para el minimo de 7 articulos arbitrados: es una
+% cita de datos, no una publicacion.
+@misc{ejeC_daley_hkracing,
+  author       = {Daley, Graham},
+  title        = {Horse Racing in {HK}},
+  howpublished = {Kaggle dataset},
+  year         = {2016},
+  note         = {{CC0} 1.0 Universal. Accessed: Sept. 6, 2026},
+  url          = {https://www.kaggle.com/datasets/gdaley/hkracing}
+}
 
 % <- Int. 3 agrega aqui
