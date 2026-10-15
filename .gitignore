@@ -1,0 +1,8 @@
+__pycache__/
+.venv/
+.pytest_cache/
+data/raw/
+data/synthetic/
+results_synth/
+results/models.joblib
+*.parquet
