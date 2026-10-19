@@ -1,22 +1,3 @@
-# LaTeX
-*.aux
-*.log
-*.out
-*.bbl
-*.blg
-*.toc
-*.synctex.gz
-*.fdb_latexmk
-*.fls
-main.pdf
-
-# Python
 __pycache__/
 .venv/
-venv/
-*.pyc
-.ipynb_checkpoints/
-
-# Datos crudos
-data/raw/
-*.csv
+src/test.py
