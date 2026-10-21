@@ -25,7 +25,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 from . import data as D
-from .preprocess import TreeCategoricals, linear_preprocessor, split_types
+from .preprocess import TreeCategoricals, linear_pipeline_prep, split_types
 
 EPS = 1e-12
 # LightGBM >= 4.6 avisa que eval_set cambiará de nombre; seguimos usándolo para
@@ -84,9 +84,8 @@ class LogRegBaseline(_FeatureModel):
         self.C = C
 
     def fit(self, train_df):
-        num, cat = split_types(train_df, self.features)
         self.pipe_ = Pipeline([
-            ("prep", linear_preprocessor(num, cat)),
+            ("prep", linear_pipeline_prep(train_df, self.features)),
             ("clf", LogisticRegression(C=self.C, max_iter=3000)),
         ])
         self.pipe_.fit(train_df[self.features], train_df["won"])
@@ -153,8 +152,7 @@ class ConditionalLogit(_FeatureModel):
         return nll + alpha * b @ b, grad + 2 * alpha * b
 
     def fit(self, train_df):
-        num, cat = split_types(train_df, self.features)
-        self.prep_ = linear_preprocessor(num, cat).fit(train_df[self.features])
+        self.prep_ = linear_pipeline_prep(train_df, self.features).fit(train_df[self.features])
         X = np.asarray(self.prep_.transform(train_df[self.features]), dtype=float)
         codes = D.race_codes(train_df)
         starts = np.flatnonzero(np.r_[True, codes[1:] != codes[:-1]])

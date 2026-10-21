@@ -39,6 +39,48 @@ def linear_preprocessor(num: list[str], cat: list[str]) -> ColumnTransformer:
     )
 
 
+class GroupMedianImputer(BaseEstimator, TransformerMixin):
+    """Imputa `col` con la mediana de su grupo (p. ej. prize dentro de race_class),
+    aprendida SOLO en train, y agrega `<col>_unrecorded` = 1 donde faltaba.
+
+    Sección V-C del paper: prize falta en un bloque contiguo de 1997-98, así que
+    una mediana global metería niveles de premio de años posteriores; el premio
+    depende sobre todo de la clase, por eso se imputa dentro de race_class.
+    """
+
+    def __init__(self, col: str = "prize", by: str = "race_class"):
+        self.col = col
+        self.by = by
+
+    def fit(self, X: pd.DataFrame, y=None):
+        self.medians_ = X.groupby(self.by)[self.col].median().to_dict()
+        self.global_ = float(X[self.col].median())
+        self.columns_ = list(X.columns)
+        return self
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        X = X[self.columns_].copy()
+        miss = X[self.col].isna()
+        X[f"{self.col}_unrecorded"] = miss.astype(int)
+        fill = X[self.by].map(self.medians_).fillna(self.global_)
+        X.loc[miss, self.col] = fill[miss]
+        return X
+
+    def get_feature_names_out(self, input_features=None):
+        return np.array(self.columns_ + [f"{self.col}_unrecorded"], dtype=object)
+
+
+def linear_pipeline_prep(train_df: pd.DataFrame, features: list[str]) -> Pipeline:
+    """Preprocesamiento de los modelos lineales (logística y logit condicional)."""
+    num, cat = split_types(train_df, features)
+    steps = []
+    if "prize" in features and "race_class" in features:
+        steps.append(("prize_by_class", GroupMedianImputer("prize", "race_class")))
+        num = num + ["prize_unrecorded"]
+    steps.append(("ct", linear_preprocessor(num, cat)))
+    return Pipeline(steps)
+
+
 class TreeCategoricals(BaseEstimator, TransformerMixin):
     """Convierte categóricas a `category` con las categorías vistas en train.
 

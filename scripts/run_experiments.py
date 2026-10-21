@@ -47,6 +47,9 @@ def evaluate_split(model, cal, df, name):
     ref = MarketBaseline().score(df) if ("win_odds" in df and name != "market") else None
     row.update(M.bootstrap_ci(df, s, ref))
     if name == "random":
+        # top-1 e IC sobre el valor esperado (score constante = desempate al azar), no sobre una tirada
+        ci0 = M.bootstrap_ci(df, np.zeros(len(df)), ref)
+        row.update({k: v for k, v in ci0.items() if k.startswith("top1")})
         row["top1"] = RandomBaseline.expected_top1(df)  # valor esperado exacto, no una tirada
     return row, s, p
 

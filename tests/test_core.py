@@ -114,3 +114,12 @@ def test_bootstrap_ci_contains_point_and_paired_diff_zero_for_same_model():
     t = M.top1_accuracy(df, s)
     assert ci["top1_lo"] <= t <= ci["top1_hi"]
     assert ci["top1_diff_vs_ref"] == 0 and ci["top1_diff_lo"] == 0 and ci["top1_diff_hi"] == 0
+
+
+def test_prize_imputed_within_class_using_train_only():
+    from hkr.preprocess import GroupMedianImputer
+    tr = pd.DataFrame({"race_class": [1, 1, 2, 2], "prize": [100.0, 300.0, 1000.0, np.nan]})
+    te = pd.DataFrame({"race_class": [1, 2, 9], "prize": [np.nan, np.nan, np.nan]})
+    out = GroupMedianImputer().fit(tr).transform(te)
+    assert list(out["prize"]) == [200.0, 1000.0, 300.0]  # clase 9 no vista: mediana global de train
+    assert list(out["prize_unrecorded"]) == [1, 1, 1]
