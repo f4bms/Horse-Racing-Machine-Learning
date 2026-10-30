@@ -1,7 +1,7 @@
 """Genera data/processed/dataset_v0.parquet y .csv a partir de races.csv y runs.csv.
 Uso:
-    python scripts/build_dataset.py --raw-dir data/raw --out data/processed/dataset_v0.parquet
-    python scripts/build_dataset.py --raw-dir data/raw --out data/processed/dataset_v0.parquet --csv
+    python src/build_dataset.py --raw-dir data/raw --out data/processed/dataset_v0.parquet
+    python src/build_dataset.py --raw-dir data/raw --out data/processed/dataset_v0.parquet --csv
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def main() -> None:
                                        desde=("date", "min"), hasta=("date", "max"))
     print(by_split.loc[["train", "val", "test"]].to_string())
     print("carreras con dead heat:", int((df.groupby("race_id")["won"].sum() > 1).sum())) # mas de un top 1
-    print("verification Warnings:")
+    print("Correcciones a NaN:")
     for k, v in report.items():
         print(f"  {k}: {v}")
     print(f"columnas ({df.shape[1]}): {list(df.columns)}")

@@ -88,14 +88,20 @@ verifica que no quede ninguna antes y después del merge.
 `result` se conserva solo para construir los targets y nunca entra como
 variable al modelo. La columna original `won` se descarta y se recalcula.
 
-**2. Preparación.** No se borran filas ni se modifican valores: quitar un
-corredor cambiaría el tamaño del campo y la estructura de un ganador por carrera.
+**2. Preparación.** No se borran filas: quitar un corredor cambiaría el
+tamaño del campo y la estructura de un ganador por carrera. Los valores
+imposibles se anulan (*NaN*).
 
 - Se agrega `field_size`: cuántos corredores tiene cada carrera.
 - `jockey_id` y `trainer_id` se guardan como texto: son categorías, no
   cantidades.
-- Los valores fuera de rango se reportan con un aviso y se conservan:
-  `declared_weight < 900` (3 filas) y `draw > 14` (1 fila).
+- Valores fuera de rango que se anulan a *NaN*:
+  - `declared_weight <850` (1 fila): 693 lb en la carrera 2287, caballo 2931,
+    cuyo peso medio en sus demás carreras es 1101 lb. Los siguientes valores
+    más bajos (896 y 898 lb) son coherentes con el historial de su caballo y
+    se conservan.
+  - `draw > 14` (1 fila): draw 15 en la carrera 5188 (`horse_no` 3). Hong Kong
+    tiene como máximo 14 cajones. Por eso `draw` queda como *NaN*.
 - Que `draw` sea mayor que el número de corredores no es un error: si un
   caballo se retira, los demás conservan el cajón asignado (pasa en ~400 filas).
 - `horse_gear = "--"` significa "sin equipo" y se conserva como categoría
@@ -114,7 +120,7 @@ toda carrera tenga al menos un ganador.
 - La carrera `3676` (2002-02-20) tiene 11 filas, pero sus posiciones llegan
   a 12: falta el corredor que llegó 8.º. Ganador y targets no se ven afectados.
 - Hay 1 fila con `draw > 14`, por encima del número de cajones; podría ser
-  un error de registro o se retiro el competidor.
+  un error de registro o se retiro el competidor, por eso se cambio a *NaN*.
 - `race_class` es un código (0, 6, 11–13 son carreras especiales/de grupo
   según `horse_ratings = "G"`), así que no es una escala ordenada.
 - `win_odds` está limitado a 99.0.

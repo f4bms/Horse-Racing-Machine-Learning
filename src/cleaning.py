@@ -6,6 +6,7 @@ unir races con runs, para que ninguna columna de resultado llegue a propagarse
 a los corredores por el join.
 
 Nada aquí se ajusta con estadísticas de la tabla: no se imputa, no se escala.
+Los valores imposibles (errores de registro) se anulan a NaN, sin reemplazo.
 Los faltantes quedan como NaN y se tratan dentro del pipeline, con train.
 """
 from __future__ import annotations
@@ -29,13 +30,14 @@ TRAIN_LAST_YEAR = 2003
 VAL_YEAR = 2004
 TEST_YEAR = 2005
 
-# Un purasangre de carreras no pesa menos de esto (lb, peso declarado con
-# equipo). Los pocos valores por debajo son errores de registro.
-MIN_DECLARED_WEIGHT = 900
+# Peso declarado (lb, con equipo) por debajo del cual el valor es un error de
+# registro y se anula. En runs.csv los pesos más bajos son 693, 896, 898, 901
+# El 693 es imposible; 896 y 898 son coherentes con el historial y se conservan.
+MIN_DECLARED_WEIGHT = 850
 
 # Ningún campo del dataset pasa de 14 corredores. Un draw mayor que el campo
 # NO es error por sí solo: si un caballo se retira, los demás conservan el
-# draw asignado. Solo un draw por encima de 14 es imposible.
+# draw asignado. Solo un draw por encima de 14 es imposible y se anula.
 MAX_DRAW = 14
 
 class DataError(ValueError):
@@ -91,26 +93,31 @@ def merge(runs: pd.DataFrame, races: pd.DataFrame) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def prepare(df: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, int]]:
-    """Agrega field_size, convierte ids de jockeys y trainers en categorías y verifica rangos."""
+    """Agrega field_size, convierte ids de jockeys y trainers en categorías y anula a NaN los valores fuera de rango.
+    """
     df = df.copy()
     report: dict[str, int] = {}
 
     # Cuántos caballos corrieron en esa carrera (es una variable).
     df["field_size"] = df.groupby("race_id")["horse_no"].transform("size")
 
-    # Revisiones: no modifican nada, solo avisan si hay valores para revisar.
+    # Correcciones: el valor imposible pasa a NaN; no se borra la fila para no alterar el campo de la carrera.
     checks = {
-        f"declared_weight < {MIN_DECLARED_WEIGHT}": df["declared_weight"] < MIN_DECLARED_WEIGHT,
-        f"draw > {MAX_DRAW}": df["draw"] > MAX_DRAW,
+        f"declared_weight < {MIN_DECLARED_WEIGHT}": ("declared_weight", df["declared_weight"] < MIN_DECLARED_WEIGHT),
+        f"draw > {MAX_DRAW}": ("draw", df["draw"] > MAX_DRAW),
     }
-    for nombre, bad in checks.items():
+    for nombre, (col, bad) in checks.items():
         report[nombre] = int(bad.sum())
         if bad.any():
-            print(f"AVISO: Valores que se pueden revisar: {nombre} ({int(bad.sum())} filas).")
+            df.loc[bad, col] = pd.NA
+            print(f"Corregido -> NaN: {nombre} ({report[nombre]} filas).")
 
     # Identificadores: son categorías que usara el modelo, no cantidades ordenables.
     for c in ("jockey_id", "trainer_id"):
         df[c] = df[c].astype(str)
+
+    # Le devuelve el valor de entero a draw
+    df["draw"] = df["draw"].astype("Int64")
 
     return df, report
 
