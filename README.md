@@ -13,14 +13,23 @@ La Parte B (modelos, métricas, tuning) está en la rama `modelos-y-evaluacion`.
 
 ```text
 .
-├── scripts/
-├── src/
-│   ├── build_dataset.py    # genera data/processed/dataset_v0.parquet
-│   └── cleaning.py         # carga, borrado POST, prepare, targets, split
 ├── data/
 │   ├── raw/                # races.csv y runs.csv originales
 │   └── processed/          # salida: dataset_v0.parquet (y .csv)
-└── requirements.txt        # libreria pip usadas para ejecutar el código
+├── docs/
+│   ├── diccionario_dataset_v0.md / .csv   # diccionario generado (no editar a mano)
+│   └── particion_y_fuga.md     # partición, variables descartadas por fuga y su verificación
+├── src/
+│   ├── build_dataset.py    # genera data/processed/dataset_v0.parquet
+│   ├── cleaning.py         # carga, borrado POST, prepare, targets, split
+│   └── data_dictionary.py  # genera el diccionario de datos en docs/
+├── tests/
+│   ├── conftest.py            # construye v0 desde data/raw una vez por sesión
+│   ├── test_cleaning_unit.py  # salvaguardas de cleaning.py con datos mock
+│   ├── test_leakage_v0.py     # tests contra fuga sobre la tabla real
+│   └── test_leakage_checks.py # verificación "solo PRE" para features históricas
+├── pytest.ini        # ejecuta lo que esta en tests/, e importa desde src/
+└── requirements.txt  # libreria pip usadas para ejecutar el código
 ```
 
 ## Cómo ejecutarlo
@@ -55,6 +64,30 @@ Salida esperada:
 | val | año 2004 | 9 902 | 789 | 2004-01-04 → 2004-12-29 |
 | test | año 2005 | 5 877 | 470 | 2005-01-01 → 2005-08-28 |
 | **Total** | | **79 447** | **6 348** | **1997-06-02 → 2005-08-28** |
+
+4. **Generar el diccionario de datos** (después de regenerar la tabla):
+
+   ```bash
+   .venv/bin/python src/data_dictionary.py
+   ```
+
+   Opciones: `--data` (por defecto `data/processed/dataset_v0.parquet`) y `--out-dir`
+   (por defecto `docs`). Escribe `docs/diccionario_<tabla>.md` y `.csv`, con rol, tipo,
+   faltantes (total y por split), valores únicos, rango o categorías y descripción de cada
+   columna. El rol sale de `NON_FEATURES` en `data_dictionary.py`: todo lo que no está ahí
+   es feature. Las descripciones salen de `DESCRIPCIONES` en el mismo archivo; una columna
+   sin descripción aparece como "sin descripción" y el script avisa en consola.
+
+5. **Correr los tests contra fuga:**
+
+   ```bash
+   .venv/bin/python -m pytest
+   ```
+
+   No hace falta generar la tabla antes: los tests la reconstruyen desde
+   `data/raw` con el mismo código. Los unitarios usan datos sintéticos y corren
+   aunque falten los CSV raw. Qué verifica cada test y por qué está en
+   [`docs/particion_y_fuga.md`](docs/particion_y_fuga.md)
 
 ## Cómo usar la tabla
 
@@ -138,9 +171,11 @@ toda carrera tenga al menos un ganador.
      - cómo se garantiza que solo se usan fechas anteriores
      - Features históricas (ventana expansiva + `shift(1)`) y shrinkage para debutantes
 -->
-- Pipeline (scikit-learn: imputación, escalado y codificación, ajustado solo con train) y tests contra fuga (pytest)
-<!-- Completar: archivo del pipeline, qué transforma cada rama
-     (numéricas / categóricas), y cómo correr los tests. -->
-- Documento de justificación (cronológica vs. aleatoria, proporciones, variables descartadas)
-<!-- Enlazar aquí docs/... cuando exista. -->
+- Pipeline (scikit-learn: imputación, escalado y codificación, ajustado solo con train)
+<!-- Completar: archivo del pipeline y qué transforma cada rama
+     (numéricas / categóricas). -->
+- Aplicar `assert_uses_only_past` (`tests/test_leakage_checks.py`) a cada feature histórica de `dataset_v1`
+
+La justificación de la partición y de las variables descartadas por fuga está en
+[`docs/particion_y_fuga.md`](docs/particion_y_fuga.md).
 

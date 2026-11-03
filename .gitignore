@@ -2,3 +2,4 @@ __pycache__/
 .venv/
 src/test.py
 data/processed/
+.pytest_cache/
