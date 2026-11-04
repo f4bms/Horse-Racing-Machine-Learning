@@ -1,0 +1,51 @@
+# Diccionario de datos: `dataset_v1.parquet`
+
+Generado por `src/data_dictionary.py` desde `data/processed/dataset_v1.parquet`. No editar a mano: regenerar después de reconstruir la tabla.
+
+- Filas: 79447
+- Columnas: 35 (24 features)
+- Carreras: 6348
+- Fechas: 1997-06-02 → 2005-08-28
+- train: 63668 filas, 5089 carreras, 1997-06-02 → 2003-12-31
+- val: 9902 filas, 789 carreras, 2004-01-04 → 2004-12-29
+- test: 5877 filas, 470 carreras, 2005-01-01 → 2005-08-28
+
+Roles: `feature` entra al modelo; `id`, `partición`, `target`, `mercado` y `resultado` se conservan pero nunca son features.
+
+| Columna | Rol | Tipo | NaN | NaN % | NaN % train / val / test | Únicos | Valores (conteo) o rango | Descripción |
+|---|---|---|---|---|---|---|---|---|
+| `race_id` | id | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 6348 | 0 – 6348 | Identificador de la carrera. |
+| `date` | id | datetime64[us] | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 682 | 1997-06-02 – 2005-08-28 | Fecha de la carrera. |
+| `split` | partición | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 3 | train (63668), val (9902), test (5877) | Partición cronológica: train (año ≤ 2003), val (2004), test (2005). |
+| `won` | target | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (73087), 1 (6360) | 1 si llegó 1.º (en empate por el primer lugar hay dos 1). Se recalcula desde `result` |
+| `y_rel` | target | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 4 | 0 (41345), 1 (19035), 2 (12707), 3 (6360) | Relevancia: 3 ganó, 2 llegó 2.º–3.º, 1 llegó 4.º–6.º, 0 el resto. |
+| `win_odds` | mercado | float64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 180 | 1 – 99 | Cuota final. Solo para el baseline de mercado, no se usa como feature. |
+| `horse_id` | id | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 4405 | 0 – 4404 | Identificador del caballo. |
+| `horse_no` | id | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 14 | 1 – 14 | El número asignado al caballo en la carrera. |
+| `race_no` | id | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 11 | 1 (8259), 2 (8508), 3 (8284), 4 (8608), 5 (8669), 6 (8670), 7 (8183), 8 (8272), 9 (5317), 10 (5194), 11 (1483) | Número de la carrera, en el daí del encuentro pueden haber msá de una carrera y así se identifican. |
+| `result` | resultado (solo targets) | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 14 | 1 – 14 | Posición de llegada (POST). Solo se usa para construir `won` y `y_rel`. |
+| `place_odds` | mercado | float64 | 3735 | 4.7 | 0.19 / 8.81 / 46.69 | 168 | 1 – 101 | Probabilidad del caballo de llegar 1º-3º antes de iniciar la carrera. |
+| `horse_age` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 9 | 2 (2098), 3 (61212), 4 (8007), 5 (4775), 6 (2244), 7 (839), 8 (225), 9 (41), 10 (6) | Edad del caballo. |
+| `horse_country` | feature | str | 2 | 0.0 | 0.0 / 0.0 / 0.0 | 16 | 16 categorías; top: AUS (29906), NZ (27497), IRE (10473), GB (6329), USA (2499) | País o región de origen del caballo. |
+| `horse_type` | feature | str | 2 | 0.0 | 0.0 / 0.0 / 0.0 | 9 | Gelding (75503), Brown (2044), Horse (1093), Colt (305), Mare (238), Rig (154), Roan (48), Filly (43), Grey (17) | Sexo del caballo, ej: *Gelding*, *Mare*, *Horse*, *Rig*, *Colt*, *Filly* |
+| `horse_rating` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 125 | 10 – 138 | Calificación durante la carrera asignada a cada cabllo por la HKJC. |
+| `horse_gear` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 822 | 822 categorías; top: -- (57373), B (3579), TT (2973), TT/B (2733), H (1360) | Equipo del caballo; `--` significa sin equipo. |
+| `declared_weight` | feature | float64 | 1 | 0.0 | 0.0 / 0.0 / 0.0 | 446 | 896 – 1369 | Peso declarado (lbs, con el equipo del jockey). Los valores < 850 se anulan a NaN (error de registro). |
+| `actual_weight` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 31 | 103 – 133 | Peso que lleva el caballo (en lbs). |
+| `draw` | feature | Int64 | 1 | 0.0 | 0.0 / 0.01 / 0.0 | 14 | 1 – 14 | Cajón de salida. Los valores > 14 se anulan a NaN (no completaron el registro o no se presentaron). |
+| `trainer_id` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 176 | 176 categorías; top: 137 (4739), 97 (4600), 75 (4578), 47 (4482), 7 (4109) | Identificador del entrenador en el momento de la carrera, guardado como texto (categoría). |
+| `jockey_id` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 186 | 186 categorías; top: 2 (4719), 64 (4381), 18 (3985), 63 (3767), 34 (3590) | Identificador del jinete en dicha carrera, guardado como texto (categoría). |
+| `venue` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | ST (51946), HV (27501) | Cadena de 2 carácteres que indica en cuál de los 2 circuitos se dio la carrera; ST = Shatin, HV = Happy Valley. |
+| `config` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 6 | A (27587), C (14426), C+3 (12373), B (9794), B+2 (7919), A+3 (7348) | Configuración de la pista, relacionada principalmente con la posición del carril interior. |
+| `surface` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (70798), 1 (8649) | Número que representa el tipo de superficie del circuito; 1=tierra, 0=césped. |
+| `distance` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 9 | 1000 (8524), 1200 (24697), 1400 (14565), 1600 (8329), 1650 (13253), 1800 (7320), 2000 (1463), 2200 (1034), 2400 (262) | Distancia de la carrera. |
+| `going` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 10 | GOOD (51389), GOOD TO FIRM (20410), GOOD TO YIELDING (4131), YIELDING (1082), FAST (878), WET SLOW (771), WET FAST (247), SLOW (187), YIELDING TO SOFT (177), SOFT (175) | Estado de la pista. |
+| `horse_ratings` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 31 | 31 categorías; top: 60-40 (27852), 80-60 (22401), 40-15 (5206), 100-80 (5109), G (3474) | Rango de calificación de los caballos que van a participar; *G* marca carreras especiales/de grupo. |
+| `prize` | feature | float64 | 5849 | 7.36 | 9.19 / 0.0 / 0.0 | 71 | 485000 – 25000000 | Premio de la carrera. Falta en un bloque de carreras de 1997-07-20 a 1997-10-15 y de 1997-12-13 a 1998-03-18. |
+| `race_class` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 10 | 0 (103), 1 (2665), 2 (7123), 3 (25061), 4 (29418), 5 (11409), 6 (475), 11 (1425), 12 (611), 13 (1157) | Código de clase; 0-6, y 11–13 son carreras especiales/de grupo, no es una escala ordenada. |
+| `field_size` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 11 | 4 (12), 5 (20), 6 (120), 7 (196), 8 (520), 9 (981), 10 (2160), 11 (5401), 12 (31728), 13 (5759), 14 (32550) | Corredores en la carrera (derivada de filas por race_id). |
+| `horse_win_rate` | feature | float64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 715 | 0.05595 – 0.171 | Tasa de victoria previa del caballo, con shrinkage hacia la tasa de train (k elegido en val). |
+| `jockey_win_rate` | feature | float64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 11959 | 0.02342 – 0.2327 | Tasa de victoria previa del jinete, con shrinkage hacia la tasa de train (k elegido en val). |
+| `trainer_win_rate` | feature | float64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 15368 | 0.05263 – 0.1342 | Tasa de victoria previa del entrenador, con shrinkage hacia la tasa de train (k elegido en val). |
+| `horse_days_since_last` | feature | float64 | 4405 | 5.54 | 5.88 / 4.28 / 4.02 | 394 | 3 – 1099 | Días desde la carrera anterior del caballo; NaN en su primera carrera del dataset. |
+| `horse_no_history` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (75042), 1 (4405) | 1 si es la primera carrera del caballo en el dataset (sin historial previo). |
