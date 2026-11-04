@@ -15,18 +15,23 @@ La Parte B (modelos, métricas, tuning) está en la rama `modelos-y-evaluacion`.
 .
 ├── data/
 │   ├── raw/                # races.csv y runs.csv originales
-│   └── processed/          # salida: dataset_v0.parquet (y .csv)
+│   └── processed/          # salida: dataset_v0 y dataset_v1 (.parquet y .csv)
 ├── docs/
-│   ├── diccionario_dataset_v0.md / .csv   # diccionario generado (no editar a mano)
-│   └── particion_y_fuga.md     # partición, variables descartadas por fuga y su verificación
+│   ├── diccionario_dataset_v0.md / .csv   # diccionarios generados (no editar a mano)
+│   ├── diccionario_dataset_v1.md / .csv
+│   ├── seleccion_k_dataset_v1.csv         # búsqueda de k del shrinkage (generada)
+│   ├── historial_v1.md                    # features históricas de v1: definición, k y controles
+│   └── particion_y_fuga.md                # partición, variables descartadas por fuga y su verificación
 ├── src/
-│   ├── build_dataset.py    # genera data/processed/dataset_v0.parquet
+│   ├── build_dataset.py    # genera data/processed/dataset_v0 o dataset_v1
 │   ├── cleaning.py         # carga, borrado POST, prepare, targets, split
+│   ├── history.py          # features históricas de v1 (tasas con shrinkage, días, sin historial)
 │   └── data_dictionary.py  # genera el diccionario de datos en docs/
 ├── tests/
-│   ├── conftest.py            # construye v0 desde data/raw una vez por sesión
+│   ├── conftest.py            # construye v0 y v1 desde data/raw una vez por sesión
 │   ├── test_cleaning_unit.py  # salvaguardas de cleaning.py con datos mock
 │   ├── test_leakage_v0.py     # tests contra fuga sobre la tabla real
+│   ├── test_dataset_v1.py     # v1 = v0 + historial, ajuste sin mirar test
 │   └── test_leakage_checks.py # verificación "solo PRE" para features históricas
 ├── pytest.ini        # ejecuta lo que esta en tests/, e importa desde src/
 └── requirements.txt  # libreria pip usadas para ejecutar el código
@@ -50,25 +55,33 @@ La Parte B (modelos, métricas, tuning) está en la rama `modelos-y-evaluacion`.
    .venv/bin/python src/build_dataset.py --csv
    ```
 
-   Opciones: `--raw-dir` (por defecto `data/raw`), `--out` (por defecto
-   `data/processed/dataset_v0.parquet`), `--csv` (guarda también una copia `.csv`).
+   Opciones: `--version` (`v0` por defecto, o `v1` con historial), `--raw-dir` (por defecto `data/raw`), `--out` (por defecto `data/processed/dataset_<version>.parquet`), `--csv` (guarda también una copia `.csv`). <br>
+   Para generar la tabla con historial:
+
+   ```bash
+   .venv/bin/python src/build_dataset.py --version v1 --csv
+   ```
+
+   Además imprime el prior y los k elegidos, y guarda la búsqueda de k en:
+   `docs/seleccion_k_dataset_v1.csv`. Detalle en [`docs/historial_v1.md`](docs/historial_v1.md).
 
    El script imprime filas, carreras, conteo por split y celdas que vale la pena revisar
    por columna. Si alguna validación falla, se detiene con `DataError`.
 
-Salida esperada:
+   Salida esperada:
 
-| split | regla | filas | carreras | período |
-|---|---|---|---|---|
-| train | año ≤ 2003 | 63 668 | 5 089 | 1997-06-02 → 2003-12-31 |
-| val | año 2004 | 9 902 | 789 | 2004-01-04 → 2004-12-29 |
-| test | año 2005 | 5 877 | 470 | 2005-01-01 → 2005-08-28 |
-| **Total** | | **79 447** | **6 348** | **1997-06-02 → 2005-08-28** |
+   | split | regla | filas | carreras | período |
+   |---|---|---|---|---|
+   | train | año ≤ 2003 | 63 668 | 5 089 | 1997-06-02 → 2003-12-31 |
+   | val | año 2004 | 9 902 | 789 | 2004-01-04 → 2004-12-29 |
+   | test | año 2005 | 5 877 | 470 | 2005-01-01 → 2005-08-28 |
+   | **Total** | | **79 447** | **6 348** | **1997-06-02 → 2005-08-28** |
 
 4. **Generar el diccionario de datos** (después de regenerar la tabla):
 
    ```bash
    .venv/bin/python src/data_dictionary.py
+   .venv/bin/python src/data_dictionary.py --data data/processed/dataset_v1.parquet
    ```
 
    Opciones: `--data` (por defecto `data/processed/dataset_v0.parquet`) y `--out-dir`
@@ -101,7 +114,7 @@ Una fila por caballo en cada carrera, ordenada por `date`, `race_id`, `horse_no`
 | `y_rel` | 3 ganó · 2 llegó 2.º–3.º · 1 llegó 4.º–6.º · 0 el resto |
 | `win_odds` | cuota final; solo para el baseline de mercado, nunca como feature |
 | `horse_id`, `horse_no`, `race_no`, `result`, `place_odds` | se conservan, pero no son features |
-| todo lo demás | features (19 en v0) |
+| todo lo demás | features (19 en v0; 24 en v1, con las 5 de historial) |
 
 Features de v0: `horse_age`, `horse_country`, `horse_type`, `horse_rating`,
 `horse_gear`, `declared_weight`, `actual_weight`, `draw`, `trainer_id`,
@@ -163,19 +176,11 @@ toda carrera tenga al menos un ganador.
 ---
 
 ### Pendiente
-- Target encoding fuera de fold de `jockey_id` / `trainer_id`
-- `dataset_v1` (con historial)
-<!-- Completar cuando se implemente:
-     - lista de features históricas y su definición
-     - valor de m del shrinkage y por qué
-     - cómo se garantiza que solo se usan fechas anteriores
-     - Features históricas (ventana expansiva + `shift(1)`) y shrinkage para debutantes
--->
+- Decidir qué hacer con los códigos crudos de `jockey_id` / `trainer_id` (reemplazarlos por el historial o usar target encoding)
 - Pipeline (scikit-learn: imputación, escalado y codificación, ajustado solo con train)
 <!-- Completar: archivo del pipeline y qué transforma cada rama
      (numéricas / categóricas). -->
-- Aplicar `assert_uses_only_past` (`tests/test_leakage_checks.py`) a cada feature histórica de `dataset_v1`
 
 La justificación de la partición y de las variables descartadas por fuga está en
-[`docs/particion_y_fuga.md`](docs/particion_y_fuga.md).
+[`docs/particion_y_fuga.md`](docs/particion_y_fuga.md). Las features históricas de v1 (definición, k del shrinkage y aspectos a considerar) están en [`docs/historial_v1.md`](docs/historial_v1.md).
 

@@ -1,11 +1,9 @@
 """
-Verificación "solo pasado" para las features históricas de dataset_v1 (punto 7 del TODO).
+Verificación "solo pasado" para las features históricas de dataset_v1.
 
-dataset_v0 NO tiene columnas de historial: no hay ninguna tasa de victoria ni
-"días desde la última carrera". Esas features llegan con dataset_v1 (tasas de
-victoria del caballo, jinete y entrenador; días desde la última carrera; indicador
-"sin historial"). Este archivo deja lista desde ahora la prueba que van a tener
-que pasar, para que v1 se construya contra una regla ya verificada.
+dataset_v0 no tiene columnas de historial. dataset_v1 (src/history.py) agrega tasas
+de victoria del caballo, jinete y entrenador, días desde la última carrera y el
+indicador "sin historial".
 
 Regla (TODO, "REGLAS"): una feature histórica solo puede usar carreras con fecha
 ANTERIOR a la de la carrera que se predice. Las carreras del mismo día tampoco
@@ -18,10 +16,8 @@ feature de una fila con fecha <= corte, esa feature leyó resultados del mismo d
 o del futuro. La prueba no depende de cómo esté implementada la feature (shift,
 expanding, merge, target encoding...).
 
-Los tests usan un dataset de juguete con un ejemplo correcto y tres fugas
-típicas, para demostrar que la prueba acepta lo correcto y detecta lo incorrecto.
-Cuando exista dataset_v1, aquí se agrega el test que aplica assert_uses_only_past
-a la función que construye sus features.
+Primero se prueba la verificación con el mock de un dataset (un ejemplo correcto
+y tres fugas típicas), y al final se aplica a las features reales de dataset_v1.
 """
 from __future__ import annotations
 
@@ -30,6 +26,8 @@ from typing import Callable, Iterable
 import numpy as np
 import pandas as pd
 import pytest
+
+from history import history_features
 
 TARGET_COLS = ("result", "won", "y_rel")
 
@@ -139,3 +137,18 @@ def test_acepta_tasa_previa_por_jinete_sin_contar_el_mismo_dia(ds):
 def test_detecta_fugas_tipicas(ds, feature):
     with pytest.raises(AssertionError):
         assert_uses_only_past(ds, feature)
+
+
+# ---------------------------------------------------------------------------
+# Features reales de dataset_v1
+# ---------------------------------------------------------------------------
+
+def test_features_historicas_de_v1_usan_solo_el_pasado(v0, v1_build):
+    """Con k y prior fijos (se ajustan aparte, como cualquier hiperparámetro), las
+    features de v1 no cambian si se alteran los resultados desde cada corte."""
+    _, fit = v1_build
+    dates = sorted(v0["date"].unique())
+    cutoffs = [dates[20], dates[len(dates) // 2],              # fecha 21 desde el inicio y la mitad (ambas consideradas aun dentro de train)
+               v0.loc[v0["split"] == "val", "date"].min(),     # primer día de val
+               v0.loc[v0["split"] == "test", "date"].min()]    # primer día de test
+    assert_uses_only_past(v0, lambda d: history_features(d, fit["k"], fit["prior"]), cutoffs)

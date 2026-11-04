@@ -160,13 +160,14 @@ Son heurísticas: una feature legítima puede ser muy predictiva y una fuga déb
 |---|---|---|
 | Borrar las columnas POST antes del join | `load_runs`, `load_races`, `merge` | `test_patrones_post_reconocen_exactamente_*`, `test_merge_rechaza_post_antes_del_join`, `test_salida_sin_columnas_post` |
 | Ninguna columna cruda desaparece ni aparece sin justificar | `build_v0` | `test_toda_columna_cruda_esta_justificada` |
-| Las features son exactamente las revisadas en §4 | `NON_FEATURES`, `feature_columns` (`src/data_dictionary.py`) | `test_features_de_v0_son_las_revisadas`, `test_targets_resultado_y_mercado_no_son_features` |
-| Ninguna feature es un *proxy* del resultado (§4.1) | — | `test_el_mercado_supera_los_umbrales`, `test_ninguna_numerica_ordena_la_carrera_como_el_resultado`, `test_ninguna_categorica_predice_al_ganador_como_el_mercado`, `test_horse_rating_es_el_rating_previo_a_la_carrera` |
+| Las features son exactamente las revisadas en (sección 4) | `NON_FEATURES`, `feature_columns` (`src/data_dictionary.py`) | `test_features_de_v0_son_las_revisadas`, `test_targets_resultado_y_mercado_no_son_features` |
+| Ninguna feature es un *proxy* del resultado (sección 4.1) | — | `test_el_mercado_supera_los_umbrales`, `test_ninguna_numerica_ordena_la_carrera_como_el_resultado`, `test_ninguna_categorica_predice_al_ganador_como_el_mercado`, `test_horse_rating_es_el_rating_previo_a_la_carrera` |
 | El orden de las filas no depende del resultado | `sort_by_race` | `test_orden_de_filas_no_depende_del_resultado` |
 | Partición cronológica, por carrera, sin cruces | `add_split`, `validate` | `test_split_sigue_la_regla_por_anio`, `test_ninguna_carrera_cruza_splits`, `test_splits_en_orden_cronologico_estricto`, unitarios de `validate` |
 | Nada se ajusta con la tabla completa (sin imputar, escalar ni codificar antes de particionar) | `prepare` | `test_valores_iguales_a_los_crudos_salvo_correcciones`, `test_no_se_pierden_corredores` |
-| Las features históricas solo usan fechas **anteriores** (las del mismo día tampoco) | dataset_v1 (punto 7) | `assert_uses_only_past` en `tests/test_leakage_checks.py`. Hoy se prueba con un dataset de juguete: acepta las tasas previas correctas y detecta tres fugas (incluir la carrera actual, usar carreras del mismo día, usar todo el historial). |
-| El preprocesamiento se ajusta solo con train; test se usa una vez al final; k y los hiperparámetros se eligen en val | Pipeline de la Parte B | Pendiente en la Parte B |
+| Las features históricas solo usan fechas **anteriores** (las del mismo día tampoco) | `src/history.py` (dataset_v1) | `assert_uses_only_past` en `tests/test_leakage_checks.py`: se prueba con un dataset de juguete (acepta las tasas correctas y detecta tres fugas típicas) y sobre las features reales de v1 (`test_features_historicas_de_v1_usan_solo_el_pasado`). Detalle en `docs/historial_v1.md`. |
+| El prior y el k del *shrinkage* se ajustan sin mirar test (prior en train, k en val) | `fit_history` (`src/history.py`) | `test_ajuste_del_historial_no_mira_test` |
+| El preprocesamiento se ajusta solo con train; test se usa una vez al final; los hiperparámetros se eligen en val | Pipeline de modelos | Todavía no implementado |
 
 Para correr los tests (desde la raíz del repositorio):
 

@@ -15,6 +15,7 @@ import pandas as pd
 import pytest
 
 from cleaning import build_v0
+from history import build_v1
 
 RAW_DIR = Path(__file__).resolve().parents[1] / "data" / "raw"
 
@@ -42,3 +43,11 @@ def v0() -> pd.DataFrame:
     _require_raw()
     df, _ = build_v0(RAW_DIR)
     return df
+
+
+@pytest.fixture(scope="session")
+def v1_build():
+    """(tabla v1, ajuste del historial: prior, k y search de k)."""
+    _require_raw()
+    df, _, fit = build_v1(RAW_DIR)
+    return df, fit

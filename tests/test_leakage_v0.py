@@ -69,7 +69,7 @@ def _rho_en_carrera(df, col):
 
 # Spearman evalúa la fuerza y dirección de la asociación monotónica entre dos variables.
 def _auc_en_val(df, col):
-    """AUC en val de `col` sola, reemplazando cada valor por su tasa de victoria en train."""
+    """AUC en val de `col` solamente, reemplazando cada valor por su tasa de victoria en train."""
     train, val = df[df["split"] == "train"], df[df["split"] == "val"]
     tasa = train.groupby(col)["won"].mean()
     score = val[col].map(tasa).fillna(train["won"].mean()).rank()

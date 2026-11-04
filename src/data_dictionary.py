@@ -74,6 +74,12 @@ DESCRIPCIONES = {
     "prize": "Premio de la carrera. Falta en un bloque de carreras de 1997-07-20 a 1997-10-15 y de 1997-12-13 a 1998-03-18.",
     "race_class": "Código de clase; 0-6, y 11–13 son carreras especiales/de grupo, no es una escala ordenada.",
     "field_size": "Corredores en la carrera (derivada de filas por race_id).",
+    # Historial (dataset_v1, src/history.py): solo usan carreras de fechas anteriores.
+    "horse_win_rate": "Tasa de victoria previa del caballo, con shrinkage hacia la tasa de train (k elegido en val).",
+    "jockey_win_rate": "Tasa de victoria previa del jinete, con shrinkage hacia la tasa de train (k elegido en val).",
+    "trainer_win_rate": "Tasa de victoria previa del entrenador, con shrinkage hacia la tasa de train (k elegido en val).",
+    "horse_days_since_last": "Días desde la carrera anterior del caballo; NaN en su primera carrera del dataset.",
+    "horse_no_history": "1 si es la primera carrera del caballo en el dataset (sin historial previo).",
 }
 
 
