@@ -80,6 +80,7 @@ DESCRIPCIONES = {
     "trainer_win_rate": "Tasa de victoria previa del entrenador, con shrinkage hacia la tasa de train (k elegido en val).",
     "horse_days_since_last": "Días desde la carrera anterior del caballo; NaN en su primera carrera del dataset.",
     "horse_no_history": "1 si es la primera carrera del caballo en el dataset (sin historial previo).",
+    "gear_any": "1 si el caballo lleva algún equipo (horse_gear distinto de `--`). Reemplaza a horse_gear en v1.",
 }
 
 
