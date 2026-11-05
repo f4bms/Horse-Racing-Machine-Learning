@@ -3,7 +3,7 @@
 Generado por `src/data_dictionary.py` desde `data/processed/dataset_v1.parquet`. No editar a mano: regenerar después de reconstruir la tabla.
 
 - Filas: 79447
-- Columnas: 35 (24 features)
+- Columnas: 33 (22 features)
 - Carreras: 6348
 - Fechas: 1997-06-02 → 2005-08-28
 - train: 63668 filas, 5089 carreras, 1997-06-02 → 2003-12-31
@@ -29,12 +29,9 @@ Roles: `feature` entra al modelo; `id`, `partición`, `target`, `mercado` y `res
 | `horse_country` | feature | str | 2 | 0.0 | 0.0 / 0.0 / 0.0 | 16 | 16 categorías; top: AUS (29906), NZ (27497), IRE (10473), GB (6329), USA (2499) | País o región de origen del caballo. |
 | `horse_type` | feature | str | 2 | 0.0 | 0.0 / 0.0 / 0.0 | 9 | Gelding (75503), Brown (2044), Horse (1093), Colt (305), Mare (238), Rig (154), Roan (48), Filly (43), Grey (17) | Sexo del caballo, ej: *Gelding*, *Mare*, *Horse*, *Rig*, *Colt*, *Filly* |
 | `horse_rating` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 125 | 10 – 138 | Calificación durante la carrera asignada a cada cabllo por la HKJC. |
-| `horse_gear` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 822 | 822 categorías; top: -- (57373), B (3579), TT (2973), TT/B (2733), H (1360) | Equipo del caballo; `--` significa sin equipo. |
 | `declared_weight` | feature | float64 | 1 | 0.0 | 0.0 / 0.0 / 0.0 | 446 | 896 – 1369 | Peso declarado (lbs, con el equipo del jockey). Los valores < 850 se anulan a NaN (error de registro). |
 | `actual_weight` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 31 | 103 – 133 | Peso que lleva el caballo (en lbs). |
 | `draw` | feature | Int64 | 1 | 0.0 | 0.0 / 0.01 / 0.0 | 14 | 1 – 14 | Cajón de salida. Los valores > 14 se anulan a NaN (no completaron el registro o no se presentaron). |
-| `trainer_id` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 176 | 176 categorías; top: 137 (4739), 97 (4600), 75 (4578), 47 (4482), 7 (4109) | Identificador del entrenador en el momento de la carrera, guardado como texto (categoría). |
-| `jockey_id` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 186 | 186 categorías; top: 2 (4719), 64 (4381), 18 (3985), 63 (3767), 34 (3590) | Identificador del jinete en dicha carrera, guardado como texto (categoría). |
 | `venue` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | ST (51946), HV (27501) | Cadena de 2 carácteres que indica en cuál de los 2 circuitos se dio la carrera; ST = Shatin, HV = Happy Valley. |
 | `config` | feature | str | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 6 | A (27587), C (14426), C+3 (12373), B (9794), B+2 (7919), A+3 (7348) | Configuración de la pista, relacionada principalmente con la posición del carril interior. |
 | `surface` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (70798), 1 (8649) | Número que representa el tipo de superficie del circuito; 1=tierra, 0=césped. |
@@ -49,3 +46,4 @@ Roles: `feature` entra al modelo; `id`, `partición`, `target`, `mercado` y `res
 | `trainer_win_rate` | feature | float64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 15368 | 0.05263 – 0.1342 | Tasa de victoria previa del entrenador, con shrinkage hacia la tasa de train (k elegido en val). |
 | `horse_days_since_last` | feature | float64 | 4405 | 5.54 | 5.88 / 4.28 / 4.02 | 394 | 3 – 1099 | Días desde la carrera anterior del caballo; NaN en su primera carrera del dataset. |
 | `horse_no_history` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (75042), 1 (4405) | 1 si es la primera carrera del caballo en el dataset (sin historial previo). |
+| `gear_any` | feature | int64 | 0 | 0.0 | 0.0 / 0.0 / 0.0 | 2 | 0 (57373), 1 (22074) | 1 si el caballo lleva algún equipo (horse_gear distinto de `--`). Reemplaza a horse_gear en v1. |

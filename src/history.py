@@ -31,6 +31,15 @@ K_GRID = [0, 1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000]
 HISTORY_FEATURES = ["horse_win_rate", "jockey_win_rate", "trainer_win_rate",
                     "horse_days_since_last", "horse_no_history"]
 
+# Columnas de v0 que en v1 se reemplazan (columna de v0 -> su reemplazo en v1).
+# Se quitan de la tabla porque el código de modelos toma como feature toda columna
+# no excluida. Para recuperarlas, v0 tiene las mismas filas con el mismo índice:
+#     v0.loc[v1.index, "jockey_id"]
+REPLACED = {"jockey_id": "jockey_win_rate", "trainer_id": "trainer_win_rate", "horse_gear": "gear_any"}
+
+# Columnas que v1 agrega a v0, en orden.
+NEW_FEATURES = HISTORY_FEATURES + ["gear_any"]
+
 
 def previous_counts(df: pd.DataFrame, key: str) -> pd.DataFrame:
     """Carreras y victorias de `key` en fechas estrictamente anteriores a cada fila."""
@@ -90,9 +99,13 @@ def history_features(df: pd.DataFrame, k: dict, prior: float) -> pd.DataFrame:
 
 
 def build_v1(raw_dir: str | Path) -> tuple[pd.DataFrame, dict[str, int], dict]:
-    """dataset_v0 + features históricas. Devuelve (tabla, correcciones, ajuste del historial)."""
+    """dataset_v0 + features históricas + gear_any, sin las columnas de REPLACED.
+    Devuelve (tabla, correcciones, ajuste del historial)."""
     df, report = build_v0(raw_dir)
     fit = fit_history(df)
     df = pd.concat([df, history_features(df, fit["k"], fit["prior"])], axis=1)
+    # 822 combinaciones de equipo con muy poca señal: queda solo "lleva algún equipo".
+    df["gear_any"] = (df["horse_gear"] != "--").astype(int)
+    df = df.drop(columns=list(REPLACED))
     validate(df)
     return df, report, fit

@@ -114,7 +114,7 @@ Una fila por caballo en cada carrera, ordenada por `date`, `race_id`, `horse_no`
 | `y_rel` | 3 ganó · 2 llegó 2.º–3.º · 1 llegó 4.º–6.º · 0 el resto |
 | `win_odds` | cuota final; solo para el baseline de mercado, nunca como feature |
 | `horse_id`, `horse_no`, `race_no`, `result`, `place_odds` | se conservan, pero no son features |
-| todo lo demás | features (19 en v0; 24 en v1, con las 5 de historial) |
+| todo lo demás | features (19 en v0; 22 en v1: + 5 de historial + `gear_any` − `jockey_id`, `trainer_id` y `horse_gear`) |
 
 Features de v0: `horse_age`, `horse_country`, `horse_type`, `horse_rating`,
 `horse_gear`, `declared_weight`, `actual_weight`, `draw`, `trainer_id`,
@@ -176,7 +176,6 @@ toda carrera tenga al menos un ganador.
 ---
 
 ### Pendiente
-- Decidir qué hacer con los códigos crudos de `jockey_id` / `trainer_id` (reemplazarlos por el historial o usar target encoding)
 - Pipeline (scikit-learn: imputación, escalado y codificación, ajustado solo con train)
 <!-- Completar: archivo del pipeline y qué transforma cada rama
      (numéricas / categóricas). -->
