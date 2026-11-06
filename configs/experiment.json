@@ -1,0 +1,17 @@
+{
+  "seed": 42,
+  "features": null,
+  "models": ["random", "market", "logreg", "gbm_binary", "clogit", "lambdamart"],
+  "tuning": {
+    "n_folds": 3,
+    "n_trials": {"logreg": 15, "clogit": 15, "gbm_binary": 40, "lambdamart": 40}
+  },
+  "learning_curve_models": ["logreg", "lambdamart"],
+  "error_analysis_model": "lambdamart",
+  "literature": [
+    {"source": "Silverman (2012), Hong Kong, 2,973 carreras", "metric": "top1",
+     "value": 0.216, "note": "Predice el caballo más rápido estimado, no el ganador oficial; periodo no especificado"},
+    {"source": "Chavan et al. (2024), mismo dataset de Kaggle", "metric": "accuracy por fila",
+     "value": 0.92, "note": "Split aleatorio 80/20; el Dummy Classifier también saca 92 %, no comparable con top-1"}
+  ]
+}
