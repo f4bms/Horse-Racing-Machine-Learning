@@ -13,6 +13,9 @@
 | `scripts/run_experiments.py` | Corre todo (`--stage dev` y luego `--stage final`) |
 | `scripts/make_synthetic.py` | Datos falsos con el formato del contrato, solo para probar |
 | `tests/test_core.py` | Tests de métricas, gradiente del clogit, grupos y contrato |
+| `notebooks/02_modelos_y_resultados.ipynb` | Lee `results/` y muestra tablas y gráficos (no entrena) |
+| `docs/busqueda_hiperparametros.md` | Espacio de búsqueda, protocolo, revisión de bordes y costo |
+| `docs/paper/metodologia_modelado.tex` | Borrador de la metodología de modelado para el paper |
 
 ## Contrato con Persona A
 
@@ -39,8 +42,17 @@ detiene con error. Para fijar la lista a mano, poner `"features": [...]` en
 pip install -r requirements.txt
 python -m pytest -q tests
 
-# desarrollo: tunea, entrena con train, calibra y reporta en val (repetible)
+# tabla con historial (parte de datos)
+python src/build_dataset.py --version v1
+
+# desarrollo: tunea, entrena con train, calibra y reporta en val (repetible, ~10-20 min)
 python scripts/run_experiments.py --data data/processed/dataset_v1.parquet --stage dev
+
+# opcional: lo mismo sin historial, para comparar v0 vs v1 en el notebook
+python src/build_dataset.py --version v0
+python scripts/run_experiments.py --data data/processed/dataset_v0.parquet --stage dev --out results_v0
+
+# ver resultados: abrir notebooks/02_modelos_y_resultados.ipynb y "Run All"
 
 # final: evalúa test UNA vez y deja results/TEST_EVALUATED.lock
 python scripts/run_experiments.py --data data/processed/dataset_v1.parquet --stage final

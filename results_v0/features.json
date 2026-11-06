@@ -1,0 +1,21 @@
+[
+  "horse_age",
+  "horse_country",
+  "horse_type",
+  "horse_rating",
+  "horse_gear",
+  "declared_weight",
+  "actual_weight",
+  "draw",
+  "trainer_id",
+  "jockey_id",
+  "venue",
+  "config",
+  "surface",
+  "distance",
+  "going",
+  "horse_ratings",
+  "prize",
+  "race_class",
+  "field_size"
+]
