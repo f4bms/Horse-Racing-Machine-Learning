@@ -12,6 +12,7 @@
 | `src/hkr/analysis.py` | Curvas de aprendizaje y análisis de errores |
 | `scripts/run_experiments.py` | Corre todo (`--stage dev` y luego `--stage final`) |
 | `scripts/make_synthetic.py` | Datos falsos con el formato del contrato, solo para probar |
+| `scripts/antes_despues.py` | Aciertos de cada modelo antes y después de entrenar, y progreso árbol por árbol |
 | `tests/test_core.py` | Tests de métricas, gradiente del clogit, grupos y contrato |
 | `notebooks/02_modelos_y_resultados.ipynb` | Lee `results/` y muestra tablas y gráficos (no entrena) |
 | `docs/busqueda_hiperparametros.md` | Espacio de búsqueda, protocolo, revisión de bordes y costo |

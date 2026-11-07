@@ -17,6 +17,6 @@
     "subsample_freq": 1,
     "n_estimators": 163
   },
-  "seconds": 67.0,
-  "seconds_per_trial": 1.67
+  "seconds": 87.0,
+  "seconds_per_trial": 2.17
 }
