@@ -1,0 +1,15 @@
+{
+  "model": "clogit",
+  "n_trials": 15,
+  "n_folds": 3,
+  "objective": "mean MRR (forward chaining)",
+  "best_cv_mrr": 0.3857710788233149,
+  "best_cv_mrr_std": 0.019707083540687415,
+  "best_cv_top1": 0.19189244765202937,
+  "best_cv_top1_std": 0.022900730475526,
+  "best_params": {
+    "alpha": 0.003907967156822882
+  },
+  "seconds": 44.1,
+  "seconds_per_trial": 2.94
+}

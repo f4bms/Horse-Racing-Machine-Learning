@@ -1,0 +1,22 @@
+{
+  "model": "gbm_binary",
+  "n_trials": 40,
+  "n_folds": 3,
+  "objective": "mean MRR (forward chaining)",
+  "best_cv_mrr": 0.40046560552039384,
+  "best_cv_mrr_std": 0.012780539753407556,
+  "best_cv_top1": 0.2103105415207854,
+  "best_cv_top1_std": 0.014139092213838508,
+  "best_params": {
+    "learning_rate": 0.14764377271189916,
+    "num_leaves": 10,
+    "min_child_samples": 6,
+    "colsample_bytree": 0.8705803569316933,
+    "subsample": 0.7281906783998275,
+    "reg_lambda": 1.7045587123347867,
+    "subsample_freq": 1,
+    "n_estimators": 35
+  },
+  "seconds": 60.9,
+  "seconds_per_trial": 1.52
+}
