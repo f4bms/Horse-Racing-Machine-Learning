@@ -4,34 +4,134 @@
 % FORMATO ACORDADO: metricas en % con un decimal; datasets abreviados.
 % Agregar filas AL FINAL del bloque del eje propio.
 % =====================================================================
+\subsection{Tabla Comparativa}
+\label{sec:tabla_comparativa}
+
+The table summarizes the main experimental studies reviewed
+across the three axes, including their modeling techniques, datasets or
+environments, primary evaluation metrics, reported results, and identified
+limitations. The comparison shows substantial variation in both prediction
+tasks and experimental protocols. Horse-racing studies generally use
+different jurisdictions, dataset sizes, target definitions, and evaluation
+procedures, while studies from adjacent domains provide evidence for
+alternative modeling techniques and problem formulations. Therefore, it
+serves primarily to organize the evidence used to identify the research gaps
+and methodological considerations discussed in the following sections, rather
+than to establish a single ranking of the reviewed models. to see more go to
+TABLE ~\ref{tab:comparativa}
+
 \begin{table*}[!t]
 \centering
 \caption{Comparison of Related Work}
 \label{tab:comparativa}
 \scriptsize
 \renewcommand{\arraystretch}{1.25}
-\begin{tabular}{@{}p{0.7cm} p{0.6cm} p{2.6cm} p{2.8cm} p{2.1cm} p{1.5cm} p{3.7cm}@{}}
+\begin{tabular}{@{}p{0.9cm} p{0.8cm} p{2.5cm} p{2.7cm} p{1.8cm} p{1.5cm} p{3.8cm}@{}}
 \toprule
-\textbf{Ref.} & \textbf{Ano} & \textbf{Tecnica} & \textbf{Dataset / entorno} &
-\textbf{Metrica principal} & \textbf{Resultado} & \textbf{Limitacion identificada} \\
+\textbf{Ref.} & \textbf{Year} & \textbf{Technique} & \textbf{Dataset / environment} &
+\textbf{Primary metric} & \textbf{Result} & \textbf{Identified limitation} \\
 \midrule
-\multicolumn{7}{@{}l}{\textit{Eje A --- dominio (Int. 1)}} \\
+
+\multicolumn{7}{@{}l}{\textit{Axis A --- domain (Int. 1)}} \\
 \midrule
-% ---------- FILAS INTEGRANTE 1 ----------
-% <- agregar filas aqui
+
+\cite{ejeA_davoodi2010} & 2010 & ANN (5 training algorithms) &
+Horse racing, Aqueduct NY (100 races) &
+Accuracy & 77.0\,\% &
+Single track; one month of data \\
+
+\cite{ejeA_schumaker2018} & 2018 & SVR &
+Harness racing, Northfield Park (Ohio) &
+Accuracy & 50.4\,\% &
+Single harness-racing track; performance depends on race-history window \\
+
+\cite{ejeA_gupta2023} & 2023 & R F + SMOTE &
+Horse racing, Turf Club of India (14,750 records) &
+Accuracy / F1-score / ROC-AUC &
+93.1\,\% / 92.9\,\% / 97.6\,\% &
+Single site; different jurisdiction from ours \\
+
+\cite{ejeA_li2025} & 2025 & Linear / log-linear regression &
+Horse racing, 3 UK racecourses &
+$R^2$ & 0.995 &
+Models winning-time consistency rather than the race winner \\
+
 \midrule
-\multicolumn{7}{@{}l}{\textit{Eje B --- tecnicas (Int. 2)}} \\
+\multicolumn{7}{@{}l}{\textit{Axis B --- techniques (Int. 2)}} \\
 \midrule
-% ---------- FILAS INTEGRANTE 2 ----------
-% <- agregar filas aqui
+
+\cite{ejeB_kholkine2020} & 2020 & XGBoost + SHAP &
+Road cycling, Tour of Flanders &
+Top-10 hits / 10 races & 6/10 (2018) &
+Small dataset; several performance across race editions \\
+
+\cite{ejeB_peng2020} & 2020 & RankNet (LSTM encoder-decoder) vs. RF/SVM/XGBoost &
+Car racing, IndyCar (Indy500) &
+Top-1 accuracy / MAE &
+79.0\,\% / 0.94 &
+Classical ML baselines did not consistently beat the no-change baseline \\
+
+\cite{ejeB_dumitrescu2022} & 2022 & Penalised Logistic Tree Regression (PLTR) &
+Credit scoring (4 datasets) &
+AUC & 85.7\,\% &
+Cross-domain; several model performance across datasets \\
+
+\cite{ejeB_vuko2025} & 2025 &
+Logistic regression / Lasso / Ridge / Elastic Net&
+Going-concern prediction, Croatia (891 obs.) &
+AUC-ROC & 84.2\,\% &
+Small, imbalanced dataset; differences between models not statistically significant \\
+
+\cite{ejeB_krzyszton2026} & 2026 & SVM + RF + GB ensemble &
+Formula 1 race results (OpenF1, 1,635 records) &
+Macro F1-score & 77.8\,\% &
+Winner class hardest; only 2023--2024 seasons \\
+
+\cite{ejeB_silverman2013} & 2013 & Conditional logistic regression + frailty (GPU) &
+Horse racing, 3,681 races &
+GPU/OpenMP speedup & by a time factor of 2.68 &
+No accuracy or AUC reported; computational result only \\
+
 \midrule
-\multicolumn{7}{@{}l}{\textit{Eje C --- dataset (Int. 3)}} \\
+\multicolumn{7}{@{}l}{\textit{Axis C --- dataset (Int. 3)}} \\
 \midrule
-% ---------- FILAS INTEGRANTE 3 ----------
-% <- agregar filas aqui
+
+\cite{ejeA_gupta2023} & 2012 &
+Hierarchical Bayesian model (running speed) &
+Horse racing, Hong Kong (2,973 races) &
+Accuracy (fastest horse) & 21.6\,\% &
+Predicts fastest horse, not official winner; period unspecified \\
+
+\cite{ejeC_chavan2024} & 2024 &
+Logistic Regression / Decision Tree / RF / SVM / Dummy Classifier &
+Horse racing, 6,348 races / 79,447 records &
+Accuracy / F1-score &
+92.0\,\% / 51.0\,\% &
+Random 80/20 split; Dummy Classifier also achieves 92.0\,\% accuracy \\
+
 \bottomrule
 \end{tabular}
 \end{table*}
+
+The comparison table uses several standard machine-learning abbreviation
+and terminology. \textit{Artificial Neural Network} (ANN) refers to a
+neural-network model for learning nonlinear relationships between input
+features and a target. \textit{Support Vector Regression} (SVR) is a
+support-vector method for predicting continuous outcomes, while
+\textit{Support Vector Machine} (SVM) is its commonly used classification
+counterpart. \textit{Random Forest} (RF) is an ensemble of decision trees
+whose predictions are aggregated, and \textit{Gradient Boosting} (GB)
+sequentially builds trees to correct previous prediction errors.
+\textit{XGBoost} is an optimized gradient-boosting implementation.
+
+\textit{SMOTE} (Synthetic Minority Over-sampling Technique) is a
+class-imbalance preprocessing method that generates synthetic minority-class
+examples. Other terms in the table describe methodological combinations rather
+than individual predictive models. For example, \textit{SHAP} (SHapley Additive
+exPlanations) is an interpretability method used to estimate the contribution 
+of individual features to model predictions. These terms describe either
+predictive models or supporting techniques and should not be interpreted as
+equivalent types of algorithms.
 
 % Formato de fila (copiar y rellenar):
 % \cite{clave} & 2022 & Tecnica & Dataset & Metrica & 27.4\,\% & Limitacion \\

@@ -5,29 +5,120 @@
 \label{sec:methodology}
 
 \subsection{Problem Formalization}
-% TODO Int.2: notacion. Una carrera r es un grupo de n_r caballos.
-% Definir si se modela P(gana | x) por caballo y luego se normaliza
-% dentro de la carrera, o si se usa un modelo de ranking directo.
-% \begin{equation} ... \end{equation}
 
-\subsection{Proposed Pipeline}
-% TODO Int.2: datos crudos -> limpieza -> feature engineering historico
-% -> split temporal -> entrenamiento -> calibracion -> ranking ->
-% evaluacion.
+In most of the works reviewed in Sections \ref{sec:ejeA} and \ref{sec:ejeB}, horse race outcome prediction is formulated as a binary classification problem. This paper argues that this simplification discards relevant information available in the data and contributes to the accuracy limitations observed in the literature. For this reason, it is proposed formulating the problem as a learning to rank problem or LTR, which is possible because the dataset used does not merely record a binary outcome for each runner, but their complete finishing position. This allows the model to leverage the full ordering of each race, rather than reducing the available signal to a single bit per runner.
 
-\subsection{Experimental Protocol}
-% TODO Int.2 (coordinar con Int.3):
-%  - Particion TEMPORAL y agrupada por race_id (no aleatoria).
-%  - Validacion respetando el orden del tiempo.
-%  - Metricas Y SU JUSTIFICACION: top-1 acc., MRR/NDCG a nivel de
-%    carrera; log loss y Brier para calibracion.
+Formally, let $r \in R$ be a race from the set of available races, and $H_r = \{h_1, h_2, \dots, h_{n_r}\}$ the set of runners competing in $r$, where $n_r$ is the number of runners in that race. Each runner $h_i \in H_r$ is described by a feature vector $\mathbf{x}_i \in R $ and has a relevance label $y_i$, derived from its final finishing position through:
 
-\subsection{Baseline Plan}
-% TODO Int.2: minimo tres.
-%  (a) heuristico (favorito por peso o posicion de salida)
-%  (b) regresion logistica simple
-%  (c) el numero de la literatura (Seccion IV, Int.3)
+\begin{equation}
+y_i = g(\text{position}_i)
+\end{equation}
+
+where $g$ is a decreasing function that assigns higher relevance to better finishing positions. This formulation allows the model to leverage the complete ordering of each race, rather than only the identity of the winner.
+
+The learning objective is then to find a scoring function $f_\theta $, parameterized by $\theta$, such that the ordering induced by $\{f_\theta(\mathbf{x}_i)\}_{i \in H_r}$ approximates the true finishing order of race $r$. An important detail that needs to be noted is that $f_\theta$ is evaluated independently for each runner, but is trained and validated by grouping observations by race, since the relevant comparison occurs exclusively among runners within the same race.
+
+\subsection{Model Selection}
+
+The choice of model was primarily guided by the need to directly optimize runner ordering, rather than a binary as it was mentioned before. Under this criterion, LambdaMART was selected which is one of the most widely used and robust algorithms in the field of learning to rank \cite{harshini2026learning}.
+
+LambdaMART combines two components. The first is MART (Multiple Additive Regression Trees), an ensemble of gradient boosted decision trees (GBDT) trained sequentially, where each tree corrects the residual errors of the previous iterations\cite{10.1145/3308558.3313447}. The second component is the set of lambda gradients, which determine the direction and magnitude by which each runner's score should be adjusted; these are computed by multiplying the gradient of a pairwise loss by the actual change that the ranking metric would undergo if two runners swapped positions\cite{10.1145/3308558.3313447}.
+
+This approach is particularly well suited when the system is evaluated directly with ranking metrics and when a set of pre extracted and calculated features are already available, both conditions hold in this project.
+
+The primary metric used to evaluate ranking quality is Normalized Discounted Cumulative Gain (NDCG), one of the most widely used listwise metrics for ranking systems, as it considers the complete list of results returned for each query[\cite{harshini2026learning}]. In this case each race rather than evaluating each runner in isolation. For a race $r$, it is defined as:
+
+\begin{equation}
+\text{DCG@}k(r) = \sum_{i=1}^{k} \frac{2^{y_i} - 1}{\log_2(i+1)}
+\end{equation}
+
+\begin{equation}
+\text{NDCG@}k(r) = \frac{\text{DCG@}k(r)}{\text{IDCG@}k(r)}
+\end{equation}
+
+where $i$ indexes the position in the ranking predicted by the model (not the true finishing position), $y_i$ is the true relevance of the runner placed at that predicted position, and $\text{IDCG@}k(r)$ is the maximum possible value of $\text{DCG@}k$ for race $r$.   
+
+\subsection{Projected Pipeline}
+
+\begin{enumerate}
+    \item \textbf{Data integration and parsing}: the dataset is provided as two related tables, one containing race-level attributes and the other containing runner-level attributes, these joined through a race identifier in a one-to-many relationship, since a single race involves multiple runners. Constructing a clear data dictionary at this stage is essential, as it determines which fields are usable downstream and prevents ambiguous or redundant fields from propagating.
+    \item \textbf{Historical features}\label{historialfeat}: Since the source tables only have raw identifiers and no pre-aggregated from statistics historical performances must therefore be constructed.
+
+    First, for any entity(horse, jockey, trainer) and race date $t$, only races strictly prior to $t$ may be used in order to prevent temporal leakage.
+    Second, in the database history is very unevenly ditributed. Horses have a median of 14 prior races, but around a 5.5\% of observations are horse's debuts and around a 24\% of horses have five races or fewer in total. Prior work has handled this by disrigarding horses with little history[\cite{ejeA_davoodi2010}] but that throws away valuable data. 
+
+    Instead, for each entity $e$ and statistic $x$, the proposed approach will use a shrinkage estimator that blends the entity's own recent history with the population average:
+
+    \begin{equation} x_e(t) = \frac{n_e(t) \cdot \tilde{x}_e(t) + k \cdot \mu_x}{n_e(t) + k} \end{equation}
+
+    where $n_e (t)$ is the number of prior races available for an entity $e$ at a time $t$, $\tilde{x}_e(t)$ is a recency-weighted average of $x$ over those prior races and k is a shrinkage strenght constant. Its important to note that recent races will weight more that old ones via a decay factor. 
+
+    With this formula both extremes will be handled without special-case rules since when an entity has a longer history $x_e (t)$ is driven mostly by $\tilde{x}_e(t)$ and when history is less pronounced it falls back smoothly to the population average.
+
+    \item \textbf{Relevance label construction}: 
+    the finishing position of each runner is mapped onto the graded relevance scale. Rather than adopting an arbitrary discretization, the thresholds are aligned with betting categories established in the horse racing domain itself \textit{win}, \textit{place}, and \textit{show}  yielding:
+\begin{equation}
+y_i =
+\begin{cases}
+3 & \text{if position}_i = 1 \\
+2 & \text{if position}_i \in \{2, 3\} \\
+1 & \text{if position}_i \in \{4, 5, 6\} \\
+0 & \text{otherwise}
+\end{cases}
+\end{equation}
+This grading was verified against the empirical distribution of finishing positions in the dataset, which is approximately uniform across positions 1 through 12 ($\approx$8\% of runners per position), confirming that no single relevance grade is trivially dominant and that the ranking task is non degenerate.
+
+\item \textbf{Race grouping}: observations are sorted contiguously by race identifier, and a group-size vector is constructed because group misconfiguration fails silently rather than raising an explicit error, the total of the group sizes is validated against the total row count before every training run.
+
+\item \textbf{Train and validation}: given that the dataset spans several racing seasons, races are partitioned chronologically rather than randomly, so that no validation or test race precedes, in time, any race used for training. A random split would place runners from the same underlying time series on both sides of the partition, reintroducing the leakage that the historical features were designed to avoid.
+
+\item \textbf{Baseline ladder training}: models are trained in order of increasing complexity, from a non-learned baseline, through a flat binary classifier and a group-normalized (conditional logit) model, up to the proposed LambdaMART ranker. Training each intermediate model is not merely a formality; it isolates the specific contribution of respecting the group structure of a race from the contribution of exploiting the full finishing order, which would otherwise be conflated in a single end to end comparison.
+
+\item \textbf{Evaluation}: model performance is assessed using the ranking metrics together with top-1 race accuracy, reported separately to allow direct comparison with the classification-based results reported in prior work.
+    
+\end{enumerate}
+
+
+\subsection{Experimental protocol}
+Given that the data covers races between the dates of June 1997 and August 2005, a chronological partition is used to prevent information from future races from influencing predictions for past races via the historical variables. More specifically this work will use races from 11997 to 2003 for training, 2004 for validation and 2005 for testing. This partition preserves the integrity of each race as an indivisible unit which means that no runner from a given race is assigned to a different set than the other runners in that same race. 
+
+\subsection{Baseline plan}
+To isolate and quantify the contribution of each design decision, the study will use the following hierarchy, ranging from lower to higher complexity.
+
+\begin{itemize}
+    \item Market favorite, serving as a non machine learning reference.
+    \item Flat binary classification( logistic regression, gradient boosting on wins and losses), representing the dominant approach in the reviewed literature.
+    \item Conditional logit which isolates the effect of satisfying the constraint that race probabilities must sum to one.
+    \item Literature baseline, corresponding to the test result reported on similar datasets studied in section [-eje A y B].
+    \item Proposed model, LambdaMART.
+\end{itemize}
 
 \subsection{Risks and Mitigation}
-% TODO Int.2: tabla corta. Leakage, desbalance, cambio de distribucion
-% 1990-2020, campos de tamano variable, valores faltantes.
+
+\label{sec:risks}
+ 
+\begin{table}[h]
+\centering
+\caption{Identified methodological risks and mitigation strategies.}
+\label{tab:risks}
+\begin{tabular}{|p{3.6cm}|p{4.2cm}|}
+\hline
+\textbf{Risk} & \textbf{Mitigation} \\
+\hline
+Temporal leakage in historical features: computing a horse's, jockey's, or trainer's form using races that occur after the one being predicted. &
+All historical features are computed exclusively over races strictly prior to the target race, and data are split chronologically (train / validation / test) rather than randomly, so that no leakage can occur across the split. \\
+\hline
+Silent misconfiguration of race-wise grouping in the ranking model: an incorrectly built group vector does not raise an explicit error, yet invalidates training. &
+The sum of group sizes is programmatically validated against the total row count before every training run. \\
+\hline
+Informational leakage via market odds: win odds already reflect the aggregated judgment of informed bettors at race time, which may inflate apparent model performance if used uncritically. &
+Models are reported and compared both with and without odds-derived features, and this decision is discussed explicitly rather than treated as a neutral feature choice. \\
+\hline
+Absence of pedigree information (sire/dam lineage) in the dataset, despite its documented relevance in the domain literature. &
+Declared as an acknowledged limitation from the survey stage onward, rather than discovered later; not compensated for by proxy variables that could introduce unjustified assumptions. \\
+\hline
+Class imbalance in the win/non-win outcome ($\approx$8\%). &
+Substantially mitigated by the learning to rank formulation itself, since the model never optimizes a binary objective over an imbalanced label; no synthetic resampling is required or applied. \\
+\hline
+\end{tabular}
+\end{table}

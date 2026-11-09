@@ -8,6 +8,60 @@
 \subsection{Axis C: The Dataset}
 \label{sec:ejeC}
 
-% TODO Int.3: describir el dataset (1990-2020, Kaggle), luego los
-% trabajos sobre datasets analogos, sus metricas, su protocolo y sus
-% problemas conocidos (sesgos, fugas, representatividad).
+\subsubsection*{\textbf{The dataset specification}} We use the \textit{Horse Racing in HK}
+dataset published on Kaggle by Graham Daley, distributed as two tables,
+\texttt{races.csv} and \texttt{runs.csv}. We verified the following directly from
+the files rather than relying on the dataset page description: 6,349 races and
+79,447 individual horse runs, spanning 1997-06-02 to 2005-08-28.
+\texttt{races.csv} records per-race attributes (venue, distance, going, class,
+sectional and finishing times, dividends); \texttt{runs.csv} records per-horse-per-
+race attributes (draw, declared/actual weight, horse rating, gear, trainer and
+jockey identifiers, sectional positions, and finishing result). Feature
+availability is consistent with a pre-race prediction setting for most columns
+(draw, weight, rating, jockey/trainer identity are known before the race), while
+several columns (sectional positions, finishing time, dividends) are only known
+during or after the race and must be excluded from any predictive feature set.
+
+\subsubsection*{\textbf{Comparable work on Hong Kong racing}} Silverman~\cite{ejeA_gupta2023}
+performs a hierarchical Bayesian analysis of Hong Kong horse racing: 36,006
+observations from 2,973 races, modelling each horse's running speed and using the
+posterior estimates to identify the horse expected to be fastest in each race,
+reaching 21.6\% accuracy against the actual outcome. This is, to our knowledge,
+the closest jurisdiction-matched published result available to us, same racing
+authority (Hong Kong) as our dataset, though roughly half our race count (2,973
+versus our 6,349) and with the exact period left unspecified in the source
+available to us, so we cannot confirm whether it overlaps with our 1997--2005
+window or covers a different span of Hong Kong Jockey Club history. The target
+itself also differs subtly from ours: Silverman's model identifies the horse with
+the \textit{highest estimated running speed}, which is correlated with but not
+identical to the \textit{official race winner} (a horse can run fastest on average
+and still lose due to pace, positioning, or trip). We treat this difference as a
+documented protocol gap, not a disqualifying one, and use it as our primary
+literature baseline. The same author, with Suchard, later moved from this Bayesian
+speed-estimation framing toward a discriminative conditional-logit model with
+frailty terms, which we read as the same research line converging toward a ranking-
+style formulation closer to what we plan to adopt.
+
+\subsubsection*{\textbf{Analogous datasets, for secondary reference}} Beyond the jurisdiction-
+matched Silverman result above, we also keep structurally similar horse-racing
+datasets from other jurisdictions as secondary analogs, both to triangulate what
+accuracy range is achievable with modern classical ML (Silverman's own result
+predates tree-ensemble methods) and because the assignment allows analogous
+datasets to complement. The closest analogs by scale are Gupta and
+Singh~\cite{ejeA_gupta2023,ejeA_gupta2024b} (Turf Club of India, 14,750 records,
+2017--2019, 11.8\% positive class) and Davoodi and Khanteymoori~\cite{ejeA_davoodi2010}
+(Aqueduct, NY, 100 races). They cover a different racing jurisdiction, wagering
+structure, and (in Davoodi and Khanteymoori's case) a much shorter time window, so
+any accuracy figure taken from them should be treated as a loose analog, not a
+like-for-like target; we discuss this comparability gap explicitly in the baseline.
+
+\subsubsection*{\textbf{Known issues}} Three dataset-level limitations are worth stating plainly.
+First, temporal coverage ends in 2005, so any claim about current racing dynamics
+(field sizes, betting patterns, track conditions) should be qualified as
+historical. Second, the positive-class rate is structurally low (roughly one winner
+per race of typically 10--14 runners), mirroring the imbalance documented in
+Gupta and Singh~\cite{ejeA_gupta2023} for a different jurisdiction, so imbalance
+handling is not optional. Third, several columns in \texttt{runs.csv} (such as
+gear, sectional positions for shorter races) contain structurally missing values
+which must be documented and imputed (or excluded) accordingly rather than dropped
+by default.

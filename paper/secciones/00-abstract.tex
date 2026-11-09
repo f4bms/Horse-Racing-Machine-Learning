@@ -1,16 +1,56 @@
 % =====================================================================
-% ABSTRACT PRELIMINAR  ---  RESPONSABLE: INTEGRANTE 1
-% Se escribe DE ULTIMO. ~150 palabras. SIN RESULTADOS.
-% Debe decir explicitamente que es preliminar (lo exige el enunciado).
+% ABSTRACT + KEYWORDS
+%
+% El enunciado (6.2.1) pide TRES cosas y exige una en particular:
+%   "El resumen se marca de forma explicita como PRELIMINAR, ya que
+%    describe el problema, la motivacion y el enfoque propuesto sin
+%    incorporar todavia resultados de ningun tipo."
+% Por eso abre con "Preliminary abstract". No le quiten esa palabra
+% hasta la Etapa 3, cuando ya haya resultados.
+%
+% CAMBIOS RESPECTO A LA VERSION ANTERIOR:
+%  1. Dice PRELIMINARY, que es requisito de rubrica.
+%  2. Antes decia "evaluating classical machine learning models and
+%     tree-based ensembles"; ahora dice learning to rank, que es lo que
+%     realmente propone la seccion de metodologia.
+%  3. Antes prometia calibracion sin decir de donde salen las
+%     probabilidades. LambdaMART devuelve scores sin escala, no
+%     probabilidades. Ahora el abstract menciona el paso de calibracion
+%     explicitamente.
+%  4. "Palabras clave" -> "Index Terms" (el paper esta en ingles).
+%
+% PENDIENTE DEL EQUIPO: la metodologia dice que la metrica primaria es
+% NDCG; este abstract nombra NDCG junto a top-1 y MRR. Si deciden que
+% manda otra, ajusten aqui tambien.
 % =====================================================================
+
 \begin{abstract}
-\textit{Resumen preliminar.} % <-- no borrar esta marca
-% TODO Int.1: problema, motivacion, enfoque propuesto, que se medira.
-% NO incluir resultados: todavia no existen.
+\textit{Preliminary abstract. This paper states the problem, the
+motivation and the proposed approach; it reports no experimental results,
+which are deferred to a later stage of the project.}
+
+Horse race prediction has traditionally been framed either as an
+independent binary classification problem over individual runners or as a
+market-efficiency question in which tote odds serve as the main predictor.
+Neither framing exploits the structure of the task: a race is a closed
+field in which a known set of competitors is placed in a complete order.
+We propose a learning-to-rank formulation over the full finishing order,
+trained exclusively on information published before the starting gate
+opens, using the Hong Kong Jockey Club records from June 1997 to August
+2005. Admissibility is decided by an explicit column-by-column leakage
+audit that removes post-race attributes such as finishing times, sectional
+positions and payouts, and the evaluation uses a chronological split in
+which every race remains an indivisible unit. Historical form is built
+from strictly earlier races. Ranking scores are converted to win
+probabilities by a calibration step fitted on the validation split, so
+that discrimination and calibration can both be reported. Model quality is
+assessed with ranking metrics together with race-level top-1 accuracy,
+mean reciprocal rank, log loss and Brier score, and the whole ladder is
+compared against the historical closing odds as an external market
+benchmark.
 \end{abstract}
 
 \begin{IEEEkeywords}
-% TODO Int.1: 4-6 palabras clave
-aprendizaje automatico, prediccion deportiva, aprendizaje de ranking,
-calibracion de probabilidades, data leakage
+machine learning, sports prediction, learning to rank, probability
+calibration, data leakage
 \end{IEEEkeywords}

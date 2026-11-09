@@ -1,53 +1,401 @@
 % =====================================================================
-%  BIBLIOGRAFIA - BibTeX  (obligatorio segun el enunciado)
+%  REFERENCIAS PROPUESTAS -- BORRADOR, NO ES referencias.bib
 %
-%  OJO: BibTeX NO respeta el % como comentario. Si escribe una entrada
-%  "AT-article{...}" escrito con arroba de verdad, igual lo intenta
-%  leer y da error. Por eso las plantillas de abajo escriben AT-article
-%  en lugar de la arroba: al copiarlas, cambie AT- por la arroba.
+%  Este archivo NO se debe copiar tal cual dentro de referencias.bib.
+%  Es una propuesta para que el equipo revise redaccion, exactitud y
+%  formato IEEE de cada cita antes de incorporarla manualmente.
 %
-%  REGLAS PARA NO PISARSE:
-%   1. Cada quien agrega SOLO dentro de su bloque, AL FINAL del bloque.
-%   2. Clave con prefijo de eje + primer autor + ano:
-%        ejeA_smith2022 / ejeB_chen2021 / ejeC_tanaka2019
-%   3. No reordenar ni reformatear entradas ajenas.
+%  Todas las entradas fueron construidas a partir de la lectura directa
+%  de los 21 papers en papers/md/ (y del PDF original para paper-05,
+%  cuyo Markdown estaba danado). Donde un dato (año, venue exacto) no
+%  pudo confirmarse en el texto extraido, se deja marcado con
+%  "VERIFICAR" en vez de inventarlo.
 %
-%  PLANTILLAS (copiar y cambiar AT- por la arroba):
-%
-%  AT-article{ejeA_apellido2022,
-%    author  = {Apellido, Nombre and Otro, Autor},
-%    title   = {Titulo del articulo},
-%    journal = {Nombre de la revista},
-%    volume  = {10},
-%    number  = {3},
-%    pages   = {123--145},
-%    year    = {2022},
-%    doi     = {10.xxxx/xxxxx}
-%  }
-%
-%  AT-inproceedings{ejeA_apellido2021,
-%    author    = {Apellido, Nombre},
-%    title     = {Titulo},
-%    booktitle = {Proc. Nombre de la Conferencia},
-%    pages     = {10--18},
-%    year      = {2021},
-%    doi       = {10.xxxx/xxxxx}
-%  }
+%  Cada entrada indica, en un comentario, que afirmacion respalda y en
+%  que seccion se usa.
 % =====================================================================
 
 
+% ---------------------------------------------------------------------
+% Usada en: 03a (dominio), 03d (tabla), 04 (baseline)
+% Respalda: ANN por caballo, Aqueduct NY, 100 carreras, 77% accuracy.
+% Fuente de los datos bibliograficos: confirmada via referencia [9] de
+% paper-05 (Gupta & Singh 2023), que cita el mismo trabajo.
+% ---------------------------------------------------------------------
+@inproceedings{ejeA_davoodi2010,
+  author    = {Davoodi, Elnaz and Khanteymoori, Ali Reza},
+  title     = {Horse Racing Prediction Using Artificial Neural Networks},
+  booktitle = {Recent Advances in Neural Networks, Fuzzy Systems and Evolutionary Computing},
+  pages     = {155--160},
+  year      = {2010}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a (dominio), 03e (brechas), 04 (baseline)
+% Respalda: split temporal estricto; falla de transferir ventana de
+% historial de greyhound a harness racing (35.4% vs 50.4%).
+% ---------------------------------------------------------------------
+@article{ejeA_schumaker2018,
+  author  = {Schumaker, Robert P.},
+  title   = {Machine Learning the Harness Track: A Temporal Investigation of Race History on Prediction},
+  journal = {Journal of International Technology and Information Management},
+  volume  = {27},
+  number  = {2},
+  pages   = {1--28},
+  year    = {2018},
+  doi     = {10.58729/1941-6679.1334}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a, 03d, 03e, 04
+% Respalda: RF + SMOTE sobre datos de carreras en India, 93.1% acc /
+% 92.9% F1 / 97.6% ROC-AUC; cita de segunda mano de Silverman (2012,
+% Hong Kong) que NO leimos directamente (ver nota en 04).
+% Leida directamente del PDF (el .md estaba danado).
+% ---------------------------------------------------------------------
+@article{ejeA_gupta2023,
+  author  = {Gupta, Meenakshi and Singh, Latika},
+  title   = {Predicting Outcomes of Horse Racing using Machine Learning},
+  journal = {International Journal on Recent and Innovation Trends in Computing and Communication},
+  volume  = {11},
+  number  = {9},
+  pages   = {38--47},
+  year    = {2023},
+  doi     = {10.17762/ijritcc.v11i9.8119}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a, 3b, 3c, 3d, 3e, 4
+% Respalda: comparacion KNN/LR/RF/NB/AdaBoost/Bagging + seleccion de
+% caracteristicas (Information Gain, Chi-Square); RF mejor (cualitativo,
+% cifras exactas no recuperables del OCR de las graficas).
+% ---------------------------------------------------------------------
+@article{ejeA_gupta2024b,
+  author  = {Gupta, Meenakshi and Singh, Latika},
+  title   = {Horse Race Results Prediction Using Machine Learning Algorithms With Feature Selection},
+  journal = {International Journal of Intelligent Systems and Applications in Engineering},
+  volume  = {12},
+  number  = {2s},
+  pages   = {132--139},
+  year    = {2024}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a, 03d
+% Respalda: regresion lineal/log-lineal sobre going/distancia/clase,
+% R^2 ~0.995 para tiempos ajustados; NO predice ganador.
+% ---------------------------------------------------------------------
+@inproceedings{ejeA_li2025,
+  author    = {Li, Mohan and Yang, Dian and Zhao, Tianyu},
+  title     = {Analysis of the Accuracy of Reported Track Conditions Utilizing Predictive Modeling},
+  booktitle = {Proceedings of the 2nd International Conference on Machine Learning and Automation},
+  year      = {2025},
+  doi       = {10.54254/2755-2721/131/2024.20543}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a, 03e
+% Respalda: contexto de dominio (secretismo de sindicatos de apuestas,
+% raices estadisticas desde los 1980s). Pieza de discusion, sin
+% experimentos propios.
+% VERIFICAR: año no aparece en el texto extraido (referencias citadas
+% llegan hasta 2021; afiliacion es una empresa privada, Alezan AI, no
+% una institucion academica -- confirmar si cumple el criterio de
+% "arbitrado" del curso antes de usarla como fuente principal).
+% ---------------------------------------------------------------------
+@misc{ejeA_colle_nd,
+  author = {Colle, Pierre},
+  title  = {What AI can do for horse-racing?},
+  year   = {n.d.},
+  note   = {Alezan AI; año de publicación no confirmado en el texto disponible}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03c, 03d, 04
+% Respalda: 6.348 carreras / 79.447 registros, casi identico a nuestro
+% dataset verificado (6.349 / 79.447) -- posible mismo dataset, fuente
+% NO confirmada en el texto. Metodologia y resultados propios no
+% recuperables del OCR.
+% ---------------------------------------------------------------------
+@inproceedings{ejeC_chavan2024,
+  author    = {Chavan, Puja and Kunekar, Pankaj and Musale, Prajakta and Shinde, Mrunal and Shinde, Atharva and Shinde, Nikhil},
+  title     = {Horse Race Prediction Using Machine Learning Algorithms},
+  booktitle = {Proceedings of Fifth International Conference on Computer and Communication Technologies},
+  series    = {Lecture Notes in Networks and Systems},
+  volume    = {897},
+  year      = {2024},
+  doi       = {10.1007/978-981-99-9704-6_30}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b, 03d
+% Respalda: XGBoost + SHAP en ciclismo de ruta; manejo nativo de
+% valores faltantes (DNFs).
+% VERIFICAR: año no aparece explicito en el texto extraido; se infiere
+% >=2020 por las referencias citadas. Venue exacto (¿conferencia
+% Springer LNCS?) tampoco esta confirmado en el texto disponible.
+% ---------------------------------------------------------------------
+@inproceedings{ejeB_kholkine2020,
+  author    = {Kholkine, Leonid and De Schepper, Tom and Verdonck, Tim and Latr{\'e}, Steven},
+  title     = {A Machine Learning Approach for Road Cycling Race Performance Prediction},
+  booktitle = {[VERIFICAR: venue exacto no confirmado en el texto extraido]},
+  year      = {[VERIFICAR: >= 2020, no confirmado explicitamente]}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b, 03e
+% Respalda: RankNet vs. RF/SVM/XGBoost en pronostico de posicion en
+% IndyCar; baselines clasicos por debajo de un baseline naive.
+% VERIFICAR: año y venue exactos no confirmados en el texto extraido
+% (formato tipo IEEE, repositorio GitHub citado: DSC-SPIDAL/rankpredictor).
+% ---------------------------------------------------------------------
+@inproceedings{ejeB_peng2020,
+  author    = {Peng, Bo and Li, Jiayu and Akkas, Selahattin and Wang, Fugang and Araki, Takuya and Yoshiyuki, Ohno and Qiu, Judy},
+  title     = {Rank Position Forecasting in Car Racing},
+  booktitle = {[VERIFICAR: venue exacto no confirmado en el texto extraido]},
+  year      = {[VERIFICAR: no confirmado explicitamente]}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b
+% Respalda: tree-based ML vs. deep learning en 79 papers comparativos;
+% TBML mas rapido (2-4 ordenes de magnitud) y frecuentemente mejor en
+% datos tabulares/grandes.
+% ---------------------------------------------------------------------
+@article{ejeB_hall2025,
+  author  = {Hall, Timothy and Rasheed, Khaled},
+  title   = {A Survey of Machine Learning Methods for Time Series Prediction},
+  journal = {Applied Sciences},
+  volume  = {15},
+  number  = {11},
+  pages   = {5957},
+  year    = {2025},
+  doi     = {10.3390/app15115957}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b, 03d
+% Respalda: PLTR/RF superan a LR/SVM/NN en 4 datasets de credit scoring
+% (AUC 0.853-0.857 vs 0.752 de la red neuronal en Kaggle "Give Me Some
+% Credit"); trade-off interpretabilidad-desempeño.
+% ---------------------------------------------------------------------
+@article{ejeB_dumitrescu2022,
+  author  = {Dumitrescu, Elena and Hu{\'e}, Sullivan and Hurlin, Christophe and Tokpavi, Sessi},
+  title   = {Machine learning for credit scoring: Improving logistic regression with non-linear decision-tree effects},
+  journal = {European Journal of Operational Research},
+  volume  = {297},
+  pages   = {1178--1192},
+  year    = {2022},
+  doi     = {10.1016/j.ejor.2021.06.053}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b
+% Respalda: gradient boosting entre los mejores en prediccion de
+% lesiones deportivas; SMOTE con efectividad inconsistente; LR a veces
+% iguala a modelos mas flexibles.
+% ---------------------------------------------------------------------
+@article{ejeB_yuan2025,
+  author  = {Yuan, Jin and Zeng, Quanwen and Li, Jun and Cong, Zhengzhou and Zhang, Yong},
+  title   = {Machine learning applications in sports injury prediction: A narrative review},
+  journal = {Science Progress},
+  volume  = {108},
+  number  = {4},
+  year    = {2025},
+  doi     = {10.1177/00368504251385956}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b
+% Respalda: TrueSkill como ejemplo de ranking bayesiano por pares
+% (contexto, no evidencia de carreras de caballos).
+% ---------------------------------------------------------------------
+@article{ejeB_bishop2013,
+  author  = {Bishop, Christopher M.},
+  title   = {Model-based machine learning},
+  journal = {Philosophical Transactions of the Royal Society A},
+  volume  = {371},
+  pages   = {20120222},
+  year    = {2013},
+  doi     = {10.1098/rsta.2012.0222}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b, 03d, 04
+% Respalda: LR vs. lasso/ridge/elastic-net en clasificacion desbalanceada
+% (18.5% positivos); metricas de clasificacion no distinguen los
+% modelos pero la calibracion si.
+% ---------------------------------------------------------------------
+@article{ejeB_vuko2025,
+  author  = {Vuko, Tina and {\v{S}}odan, Slavko and Perica, Ivana},
+  title   = {Going concern prediction -- A horse race between traditional and regularization machine learning models},
+  journal = {Croatian Operational Research Review},
+  volume  = {16},
+  number  = {2},
+  pages   = {165--176},
+  year    = {2025},
+  doi     = {10.17535/crorr.2025.0014}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03d
+% Respalda: ensamble SVM+RF+GB para resultados de Formula 1, F1-score
+% macro 77.8%; clase "ganador" la mas dificil de predecir.
+% ---------------------------------------------------------------------
+@article{ejeB_krzyszton2026,
+  author  = {Krzyszto{\'n}, Sylwia Agata and Smo{\l}ka, Jakub},
+  title   = {Application of machine learning for predicting Formula 1 race results},
+  journal = {Journal of Computer Sciences Institute},
+  volume  = {38},
+  pages   = {81--86},
+  year    = {2026}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b, 03d
+% Respalda: Random Forest (83.8% accuracy) como entrada de un modelo
+% basado en agentes; ejemplo de ML clasico con CV de 10 pliegues.
+% ---------------------------------------------------------------------
+@article{ejeB_platas2023,
+  author  = {Platas-L{\'o}pez, Alejandro and Guerra-Hern{\'a}ndez, Alejandro and Quiroz-Castellanos, Marcela and Cruz-Ram{\'i}rez, Nicandro},
+  title   = {Agent-Based Models Assisted by Supervised Learning: A Proposal for Model Specification},
+  journal = {Electronics},
+  volume  = {12},
+  number  = {3},
+  pages   = {495},
+  year    = {2023},
+  doi     = {10.3390/electronics12030495}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03b
+% Respalda: gradient boosting/LightGBM dominando el M5 forecasting
+% competition; critica a la falta de interpretabilidad del ML (SHAP/LIME
+% como mitigacion).
+% ---------------------------------------------------------------------
+@article{ejeB_tjostheim2025,
+  author  = {Tj{\o}stheim, Dag},
+  title   = {Selected Topics in Time Series Forecasting: Statistical Models vs. Machine Learning},
+  journal = {Entropy},
+  volume  = {27},
+  number  = {3},
+  pages   = {279},
+  year    = {2025},
+  doi     = {10.3390/e27030279}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03a, 03e
+% Respalda: advertencia metodologica contra cross-validation con
+% shuffling en datos deportivos ordenados temporalmente; recomienda
+% particion cronologica / ventana expansiva.
+% ---------------------------------------------------------------------
+@article{ejeB_bunker2019,
+  author  = {Bunker, Rory P. and Thabtah, Fadi},
+  title   = {A machine learning framework for sport result prediction},
+  journal = {Applied Computing and Informatics},
+  volume  = {15},
+  number  = {1},
+  pages   = {27--33},
+  year    = {2019},
+  doi     = {10.1016/j.aci.2017.09.005}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03e (brechas, fuera de alcance)
+% Respalda: revision veterinaria sobre estres y desempeño deportivo
+% equino (no es un paper de prediccion/ML).
+% Leida directamente (agente de extraccion, lote papers 13-17).
+% ---------------------------------------------------------------------
+@article{ejeA_bartolome2016,
+  author  = {Bartolom{\'e}, E. and Cockram, M. S.},
+  title   = {The Influence of Stress on Horse Sport Performance},
+  journal = {Journal of Equine Veterinary Science},
+  volume  = {40},
+  pages   = {84--93},
+  year    = {2016}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03e (brechas, fuera de alcance)
+% Respalda: ANOVA sobre factores no relacionados con entrenamiento
+% (edad, sexo, color, sede) en puntajes de enganche (driving); no es
+% carreras ni prediccion.
+% Leida directamente (agente de extraccion, lote papers 18-21).
+% ---------------------------------------------------------------------
+@article{ejeA_stachurska2019,
+  author  = {Stachurska, Anna and Liss, Marta and Pawlak, Dorota},
+  title   = {Factors other than training that influence horse driving scores},
+  journal = {Pferdeheilkunde -- Equine Medicine},
+  volume  = {35},
+  number  = {2},
+  pages   = {159--165},
+  year    = {2019},
+  doi     = {10.21836/PEM20190209}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03e (brechas, fuera de alcance)
+% Respalda: evaluacion genetica (BLUP, heredabilidad) en poblaciones
+% equinas españolas de disciplinas olimpicas; no es prediccion de
+% resultados de carreras.
+% Leida directamente (agente de extraccion, lote papers 18-21).
+% ---------------------------------------------------------------------
+@article{ejeA_gomez2026,
+  author  = {G{\'o}mez, Mar{\'i}a Dolores and S{\'a}nchez-Guerrero, Mar{\'i}a Jos{\'e} and Perdomo-Gonz{\'a}lez, Davinia Isabel and Ripoll{\'e}s-Lobo, Mar{\'i}a and Bartolom{\'e}, Ester and Valera, Mercedes},
+  title   = {Integrating Performance Records and Genetic Evaluations in Spanish Horse Populations Competing in Olympic Disciplines},
+  journal = {Life},
+  volume  = {16},
+  number  = {3},
+  pages   = {455},
+  year    = {2026},
+  doi     = {10.3390/life16030455}
+}
+
+% ---------------------------------------------------------------------
+% Usada en: 03c
+% Respalda: identificacion de la fuente primaria del dataset (Kaggle,
+% gdaley/hkracing), tal como indica CLAUDE.md.
+% ---------------------------------------------------------------------
+@misc{kaggle_hkracing,
+  author = {Daley, G.},
+  title  = {Horse Racing in Hong Kong},
+  year   = {n.d.},
+  note   = {Kaggle dataset},
+  url    = {https://www.kaggle.com/datasets/gdaley/hkracing/data}
+}
+
+
 % =====================================================================
-% ================  EJE A - DOMINIO  (INTEGRANTE 1)  ==================
+% AGREGAR ESTAS TRES ENTRADAS AL FINAL DE referencias.bib
+%
+% Sin ellas, el PDF muestra [?] en cuatro lugares:
+%   - Seccion VI-A:  "published by Daley [?]"
+%   - Seccion VI-B:  "racetrack efficiency literature [?]"
+%   - Seccion VI-B:  "a scikit-learn [?] Pipeline"
+%   - Seccion VII-G: "we nonetheless cite the source [?]"
+%
+% Las claves TIENEN que quedar escritas exactamente asi, porque son las
+% que usan las secciones 06 y 07.
+%
+% NOTA sobre el conteo de la rubrica: ninguna de las tres cuenta para el
+% minimo de 7 articulos arbitrados por integrante. Daley es cita de
+% datos, Benter es capitulo de libro y Pedregosa es cita de software.
 % =====================================================================
 
-% Capitulo clasico sobre modelado de carreras y eficiencia del mercado
-% de apuestas. Sostiene el argumento de la Seccion VI-B: por que las
-% cuotas de cierre se usan como baseline externo y no como feature.
-% NO cuenta para el minimo de 7 articulos arbitrados por integrante,
-% porque es capitulo de libro, no articulo de revista ni conferencia.
-% VERIFICAR capitulo y paginas en la edicion que consulten: el texto
-% original es de 1994 y lo que se cita normalmente es la reimpresion
-% de World Scientific.
+@misc{ejeC_daley_hkracing,
+  author       = {Daley, Graham},
+  title        = {Horse Racing in {HK}},
+  howpublished = {Kaggle dataset},
+  year         = {2016},
+  note         = {{CC0} 1.0 Universal. Accessed: Sept. 6, 2026},
+  url          = {https://www.kaggle.com/datasets/gdaley/hkracing}
+}
+
+% Sostiene el argumento de la Seccion VI-B: por que las cuotas de cierre
+% se usan como baseline externo y no como feature.
+% VERIFICAR paginas en la edicion que consulten: el texto original es de
+% 1994 y lo que se cita normalmente es la reimpresion de World Scientific.
 @incollection{ejeA_benter2008,
   author    = {Benter, William},
   title     = {Computer Based Horse Race Handicapping and Wagering Systems: A Report},
@@ -58,39 +406,54 @@
   year      = {2008}
 }
 
-% <- Int. 1 agrega aqui
-
-
-% =====================================================================
-% ================  EJE B - TECNICAS  (INTEGRANTE 2)  =================
-% =====================================================================
-
-@inproceedings{ejeB_chen2016,
-  author    = {Chen, Tianqi and Guestrin, Carlos},
-  title     = {{XGBoost}: A Scalable Tree Boosting System},
-  booktitle = {Proc. 22nd ACM SIGKDD Int. Conf. Knowledge Discovery and Data Mining},
-  pages     = {785--794},
-  year      = {2016},
-  doi       = {10.1145/2939672.2939785}
+@article{ejeB_pedregosa2011,
+  author  = {Pedregosa, Fabian and Varoquaux, Ga{\"e}l and Gramfort, Alexandre
+             and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier
+             and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron
+             and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre
+             and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu
+             and Duchesnay, {\'E}douard},
+  title   = {Scikit-learn: Machine Learning in {Python}},
+  journal = {Journal of Machine Learning Research},
+  volume  = {12},
+  pages   = {2825--2830},
+  year    = {2011}
 }
 
-% <- Int. 2 agrega aqui
-
-
-% =====================================================================
-% ================  EJE C - DATASET  (INTEGRANTE 3)  ==================
-% =====================================================================
-
-% Cita del dataset. Licencia CC0 1.0 (dominio publico), verificada en
-% Kaggle. NO cuenta para el minimo de 7 articulos arbitrados: es una
-% cita de datos, no una publicacion.
-@misc{ejeC_daley_hkracing,
-  author       = {Daley, Graham},
-  title        = {Horse Racing in {HK}},
-  howpublished = {Kaggle dataset},
-  year         = {2016},
-  note         = {{CC0} 1.0 Universal. Accessed: Sept. 6, 2026},
-  url          = {https://www.kaggle.com/datasets/gdaley/hkracing}
+@inproceedings{harshini2026learning,
+  title={Learning-Based Ranking Models for Information Retrieval},
+  author={Harshini, Macherla and Rohini, Rompicherla and Alekhya, Domala and Shiva, Medipelli and Akash, Nagaram},
+  booktitle={2026 IEEE 1st International Conference on Intelligent Technologies for a Sustainable and Inclusive Future (ICITSIF)},
+  pages={365--370},
+  year={2026},
+  organization={IEEE}
 }
 
-% <- Int. 3 agrega aqui
+@inproceedings{10.1145/3308558.3313447,
+author = {Hu, Ziniu and Wang, Yang and Peng, Qu and Li, Hang},
+title = {Unbiased LambdaMART: An Unbiased Pairwise Learning-to-Rank Algorithm},
+year = {2019},
+isbn = {9781450366748},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3308558.3313447},
+doi = {10.1145/3308558.3313447},
+abstract = {Recently a number of algorithms under the theme of 'unbiased learning-to-rank' have been proposed, which can reduce position bias, the major type of bias in click data, and train a high-performance ranker with click data. Most of the existing algorithms, based on the inverse propensity weighting (IPW) principle, first estimate the click bias at each position, and then train an unbiased ranker with the estimated biases using a learning-to-rank algorithm. However, there has not been a method for unbiased pairwise learning-to-rank that can simultaneously conduct debiasing of click data and training of a ranker using a pairwise loss function. In this paper, we propose a novel framework to accomplish the goal and apply this framework to the state-of-the-art pairwise learning-to-rank algorithm, LambdaMART. Our algorithm named Unbiased LambdaMART can jointly estimate the biases at click positions and the biases at unclick positions, and learn an unbiased ranker. Experiments on benchmark data show that Unbiased LambdaMART can significantly outperform existing algorithms by large margins. In addition, an online A/B Testing at a commercial search engine shows that Unbiased LambdaMART can effectively conduct debiasing of click data and enhance relevance ranking.},
+booktitle = {The World Wide Web Conference},
+pages = {2830–2836},
+numpages = {7},
+keywords = {LambdaMART, Learning-to-Rank, Unbiased Learning-to-Rank},
+location = {San Francisco, CA, USA},
+series = {WWW '19}
+}
+
+@article{article,
+author = {Bolton, Ruth and Chapman, Randall},
+year = {1986},
+month = {08},
+pages = {1040-60},
+title = {Searching for Positive Returns at the Track},
+volume = {32},
+journal = {Management Science},
+doi = {10.1287/mnsc.32.8.1040}
+}

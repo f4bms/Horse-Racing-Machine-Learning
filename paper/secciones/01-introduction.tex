@@ -1,13 +1,61 @@
-% =====================================================================
-% INTRODUCTION  ---  RESPONSABLE: INTEGRANTE 1
-% =====================================================================
 \section{Introduction}
 \label{sec:introduction}
 
-% --- Contexto y relevancia ---
-% TODO Int.1: por que este es un problema interesante DE ML (ranking
-% dentro de grupos, alto desbalance, incertidumbre irreducible,
-% un mercado de cuotas que actua como predictor competidor).
+Horse racing occupies a distinctive position within sports analytics, unlike most team sports, each race is a closed competition among a small set of participants with a single unambiguous outcome recorded down to the finishing order of every runner. This structure has made horse racing a recurring test bed for outcome prediction research since at least the 1980s \cite{article} and it remains an active area of application for machine learning today. Driven largely by the scale of the betting industry built around it, the Hong Kong Jockey Club alone organizes close to 700 races per season across its two tracks, generating betting turnover in the billions of dollars annually. This combination of a well defined prediction target, a mature and data rich domain, and clear practical stakes makes horse race outcome prediction a useful problem through which to examine how a modeling formulation not merely a choice of algorithm affects prediction quality.
 
-% --- Estructura del documento (parrafo final de esta seccion) ---
-% TODO Int.1: "The remainder of this paper is organized as follows..."
+As detailed more in Section \ref{sec:related}, the great majority of the machine learning literature on this problem formulates it as binary classification, each runner is labeled as winner or non winner and standard classifiers are trained to separate the two classes. This formulation discards information that is often already present in the data used: most race datasets, including the one used in this work, record the complete finishing order of every runner, not merely the identity of the winner. Reducing this ordinal signal to a single binary label is a modeling choice, not a constraint imposed by the data. It is also, we argue, a contributing factor to a pattern visible across several of the reviewed studies: reported classification metrics that are difficult to reconcile with the extreme class imbalance inherent to the problem, or with the small scale of the datasets used to obtain them.
+
+This motivates the central question addressed by this work:
+
+\begin{quote}
+\textit{Does formulating horse race outcome prediction as a learning-to-rank
+problem, trained to exploit the complete finishing order of each race rather
+than a binary win/loss label, improve the identification of race winners relative
+to the binary classification formulation predominant in the literature?}
+\end{quote}
+
+The working hypothesis is that a learning to rank model, will outperform binary
+classification baselines on top 1 race accuracy because it is trained on an objective
+which is correctly ordering all runners of a race, that is strictly more informative
+than a binary label and because it does not require the class rebalancing procedures
+that binary classification approaches rely on to compensate for the natural imbalance
+of a one winner per race outcome.
+
+The specific objectives of this work are to:
+\begin{enumerate}
+    \item Define a race-level prediction framework for horse-racing
+    outcomes that represents the relative performance of competing horses
+    within each race and establishes a relevance formulation grounded in
+    established betting categories rather than arbitrary discretization.
+
+    \item Develop a historical feature-engineering procedure that
+    constructs race-time predictors exclusively from information available
+    before each race, while preserving horses and other entities with limited
+    historical observations and preventing temporal leakage.
+
+    \item Establish a structured baseline ladder to separately assess
+    the contribution of race-level grouping and the additional information
+    provided by the complete finishing order, allowing the effect of each
+    modeling decision to be evaluated independently.
+
+    \item Evaluate the proposed approach against the established
+    baseline ladder and relevant results from the literature using reproducible
+    experimental procedures and evaluation metrics appropriate to the
+    prediction task.
+\end{enumerate}
+
+The remainder of this document is organized as follows. Section~\ref{sec:related}
+reviews prior work along three axes: approaches to the horse racing prediction problem
+in general, the technical methods relevant to machine learning, and studies using the
+dataset or comparable datasets employed in this work. The subsequent section \ref{sec:baseline-lit}
+describe the literature baseline and the procedures used to support a reproducible
+evaluation. Section~\ref{sec:methodology} presents the proposed methodology, beginning
+with the formal definition of the prediction task and continuing with the relevance
+formulation, feature construction, model selection, experimental design, baseline
+ladder, risks, and evaluation metrics. Section~\ref{sec:analysis} provides the
+technical analysis of the dataset, including its data dictionary, leakage audit,
+data-quality assessment, outlier detection, class imbalance, and feature distributions
+and correlations. Section~\ref{sec:ethics} discusses the ethical considerations
+associated with the potential use and broader context of the proposed system. Finally,
+Section~\ref{sec:ai-disclosure} discloses the use of generative AI tools throughout the
+development of the work and describes the verification procedures applied by the authors.
