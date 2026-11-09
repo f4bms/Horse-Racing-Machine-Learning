@@ -1,0 +1,138 @@
+% =====================================================================
+% EJE A - EL PROBLEMA / DOMINIO  ---  RESPONSABLE: INTEGRANTE 1
+% Como ha abordado la literatura la prediccion de resultados en
+% carreras y deportes con datos tabulares? Que enfoques dominan?
+% Que se considera resuelto y que sigue abierto?
+% ORGANIZAR POR ENFOQUE, no un parrafo por articulo.
+% =====================================================================
+\subsection{Axis A: The Problem Domain}
+\label{sec:ejeA}
+
+Predicting the outcome of a horse race is framed in the literature in two largely
+disconnected ways: as a supervised classification problem over pre-race tabular
+features, and, less frequently, as a market-efficiency question about whether
+bookmaker odds already encode most of the predictable signal. These objectives are
+not interchangeable: they involve different target variables, evaluation procedures,
+and interpretations of predictive performance. Our review found supervised learning
+over pre-race tabular information is a recurring approach, while the formulation of
+the race as a direct within-race ranking problem is less explicitly addressed.
+
+\subsubsection*{\textbf{Classical statistical models}}
+Early and still-recurring approaches rely on
+regression rather than modern ML. Li et al.\cite{ejeA_li2025} fit linear and
+log-linear regression models on going (track condition), distance and class to
+predict winning times at three UK racecourses, reporting $R^2 \approx 0.995$ for
+the fitted times themselves. However, the objective of the study is to audit
+whether officially reported track conditions are consistent with observed
+performance, not to predict the winner or establish a ranking of the horses; they
+explicitly note this is a starting point and suggest tree-based ML as a natural
+extension. This distinction isimportant because it illustrates a recurring pattern:
+regression-based work in this domain has mostly targeted auxiliary quantities
+(going, finishing time) rather than the win/place outcome itself, which is the kind
+of outcome-prediction aimed to solved in this project.
+
+\subsubsection*{\textbf{Machine learning approaches}} The reviewed horse-racing studies show a
+range of supervised learning approaches and experimental settings. Davoodi and
+Khanteymoori~\cite{ejeA_davoodi2010} use artificial neural networks to predict the
+finishing time of individual horses at Aqueduct Race Track in New York. Their
+dataset contains 100 races from January 2010, and the authors compare five
+supervised training algorithms. They report an average accuracy of approximately
+77\%. The study therefore provides evidence that nonlinear supervised models can be
+applied to horse-racing data, but its small temporal and geographic scope limits
+conclusions about generalization.
+
+Schumaker\cite{ejeA_schumaker2018} studies harness racing at Northfield Park in
+Ohio using Support Vector Regression and historical race-performance variables. A
+key contribution of the study is its explicit temporal separation: data from
+October 2009 through September 2010 are used for training, while October through
+December 2010 are reserved for testing. The study also compares different race
+history windows and reports that the Time 4--3 configuration performs substantially
+better than the Time 7--3 configuration for the harness-racing setting. In
+particular, Time 7--3 achieves 35.42\% accuracy, whereas Time 4--3 achieves 50.44\%
+across the reported wagering analysis. These results shows that feature-history
+configurations developed for one racing subtype should not be assumed to transfer
+directly to another without validation. An important clarifition is that with the
+term Time 4--3, for example, we refer to the previous races being considered as
+reference for the study settings, in this case 4--3 considers from 4th to 3th
+previous race.
+
+Gupta and Singh~\cite{ejeA_gupta2023} examine horse-race prediction using data
+collected from a horse-racing website in India. Their dataset contains 14,750
+records and 56 attributes, with wins representing only 11.8\% of the observations.
+The authors report that a Random Forest model trained without imbalance handling
+can achieve high accuracy while failing to identify the minority class, whereas
+applying SMOTE improves the reported classification results to 93.1\% accuracy,
+92.9\% F1-score (balance between precision and recall), and 97.6\% ROC-AUC (ability
+to distinguish between classes across different decision thresholds). This study
+highlights an important domain characteristic: accuracy alone can be misleading
+when the target distribution is highly imbalanced, making class-sensitive metrics
+and appropriate training procedures important for horse-racing prediction. A
+related study by Gupta and Singh~\cite{ejeA_gupta2024b} compares K-nearest
+neighbors (KNN), logistic regression, Random Forest, Gaussian Naive Bayes,
+AdaBoost, and Bagging, together with Information Gain and Chi-Square feature-
+selection procedures. The authors report that the effectiveness of feature
+selection depends on the selection strategy, although, the Random Forest provides
+the best performance among the evaluated models across the despite feature-
+selection settings, followed by AdaBoost as another good option.
+
+\subsubsection*{\textbf{Market efficiency and odds as a predictor}} Colle~\cite{ejeA_colle_nd}
+notes that horse-racing prediction research is comparatively scarce next to
+mainstream team sports precisely because commercial betting syndicates keep their
+methods private, and traces the field's statistical roots to pari-mutuel market
+modelling from the 1980s. Chavan et al.~\cite{ejeC_chavan2024} summarize a study on
+Champ de Mars (Mauritius) in which betting odds alone reached only around 7.4\%
+correct-rank prediction, which they interpret as evidence that odds are not, by
+themselves, a strong predictor of finishing order on that track.
+
+\subsubsection*{\textbf{What is comparatively settled}} Across the studies we read, tree-ensemble
+and kernel methods consistently outperform plain linear/logistic baselines on
+tabular horse-racing features once class imbalance is addressed, and feature sets
+built from pre-race information (weight, draw, jockey/trainer history, ratings)
+are treated as the standard input space; nobody in our corpus argues that these
+features are irrelevant. What remains open is precisely what our project
+targets: first, every horse-racing-specific study we found evaluates on a single
+track, a short time window (weeks to a few years) or a single jurisdiction, so
+generalization across time and venues is essentially untested; second, none of the
+studies we read formulate the problem as a within-race ranking task (predicting an
+order over the runners of a given race) rather than an independent per-horse
+binary classification, even though a race is intrinsically a comparison among a
+fixed, known group of competitors; and third, explicit prevention of temporal data
+leakage is rare. Only Schumaker~\cite{ejeA_schumaker2018} uses a clean
+chronological split, while the others do not describe how (or whether) they
+avoided mixing future information into training folds. These three gaps are
+picked up again, together with the dataset-specific ones, in
+Section~\ref{sec:brechas}.
+
+\subsubsection*{\textbf{Synthesis of the domain}} The reviewed literature does not
+support the claim that a single modeling approach has been established as universally
+superior for horse-racing prediction. Instead, the studies demonstrate that the problem
+has been formulated in different ways, including continuous prediction of performance
+variables, individual-horse outcome prediction, and wagering-oriented prediction.
+Tree-based ensembles, neural networks, support-vector methods, and linear models
+all appear in the reviewed literature, but their reported results depend strongly
+on the target variable, dataset, racing subtype, feature construction, and
+evaluation protocol.
+
+Two methodological patterns are particularly relevant to the present project.
+First, several studies operate within a single racecourse, jurisdiction, or
+relatively short observation period, which limits the evidence available about
+generalization across time and venues. Second, the reviewed studies use different
+target definitions and evaluation procedures, making direct comparisons of reported
+accuracy difficult. Schumaker~\cite{ejeA_schumaker2018} provides a useful
+counterexample by explicitly separating historical training data from a later
+testing period, illustrating the importance of evaluating a model under a temporal
+setting when the objective is future prediction.
+
+These observations motivate two research gaps for the present project. First, the
+generalization of horse-racing prediction models across a longer historical period
+and a different data setting remains insufficiently characterized in the reviewed
+literature. Second, although race outcomes are inherently comparative because
+several horses compete in the same event, the reviewed studies primarily evaluate
+individual-horse predictions or wagering decisions rather than explicitly
+formulating the task as a within-race ranking problem. These gaps provide the
+domain-level motivation for the following axes. The techniques axis evaluates
+which classical machine-learning methods are appropriate for structured racing data
+and under what assumptions, while the dataset axis examines prior work using the
+selected Hong Kong racing data and establishes the most appropriate baseline.
+Together, these analyses will determine which aspects of the problem can be
+addressed by the proposed study and which remain outside its scope.
