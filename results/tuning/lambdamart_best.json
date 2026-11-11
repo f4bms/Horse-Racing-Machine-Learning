@@ -3,20 +3,20 @@
   "n_trials": 40,
   "n_folds": 3,
   "objective": "mean MRR (forward chaining)",
-  "best_cv_mrr": 0.4061989623753573,
-  "best_cv_mrr_std": 0.01369424802445219,
-  "best_cv_top1": 0.21532746202821854,
-  "best_cv_top1_std": 0.014082757936991996,
+  "best_cv_mrr": 0.4066750136896853,
+  "best_cv_mrr_std": 0.010850566199252173,
+  "best_cv_top1": 0.2155973323919704,
+  "best_cv_top1_std": 0.008009893199296202,
   "best_params": {
-    "learning_rate": 0.05510101409342539,
-    "num_leaves": 13,
-    "min_child_samples": 3,
-    "colsample_bytree": 0.9164417293516346,
-    "subsample": 0.9680358437630047,
-    "reg_lambda": 0.016617151479448273,
+    "learning_rate": 0.06346806066259159,
+    "num_leaves": 10,
+    "min_child_samples": 26,
+    "colsample_bytree": 0.4179065959127049,
+    "subsample": 0.6263015423409664,
+    "reg_lambda": 0.009013312156551717,
     "subsample_freq": 1,
-    "n_estimators": 163
+    "n_estimators": 232
   },
-  "seconds": 87.0,
-  "seconds_per_trial": 2.17
+  "seconds": 183.3,
+  "seconds_per_trial": 4.58
 }
