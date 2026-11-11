@@ -1,0 +1,71 @@
+% =====================================================================
+% BRECHAS  ---  SE ESCRIBE ENTRE LOS TRES, AL FINAL
+% Sin este apartado el survey es "un catalogo de lecturas" (enunciado).
+% Insumo: leer en vertical la columna "Limitacion" de la tabla.
+% =====================================================================
+\subsection{Identified Research Gaps}
+\label{sec:brechas}
+
+\subsubsection*{\textbf{Gaps identified in the literature}} First, horse-racing-specific research is
+generally restricted to a single racing venue, jurisdiction, or relatively short
+observation period. Davoodi and Khanteymoori~\cite{ejeA_davoodi2010} use one month
+of data from a single track, Schumaker~\cite{ejeA_schumaker2018} uses 15 months
+from one harness-racing track, and Gupta and Singh~\cite{ejeA_gupta2023,ejeA_gupta2024b}
+use three seasons from a single Indian racing operator. Consequently, the
+literature provides limited evidence about whether reported models generalize
+across venues or racing jurisdictions. Second, Schumaker~\cite{ejeA_schumaker2018}
+shows that a race-history feature window developed for greyhound racing performs
+poorly when transferred to harness racing, with wagering accuracy decreasing from
+50.4\% to 35.4\%. This provides direct evidence that feature configurations should
+be validated for the specific racing context rather than transferred without re-
+evaluation. Third, Yuan et al.~\cite{ejeB_yuan2025} and Hall and Rasheed~\cite{ejeB_hall2025}
+emphasize that comparisons across studies are difficult because differences in
+features, data splits, preprocessing, and evaluation procedures can obscure the
+effect of the modeling technique itself.
+
+\subsubsection*{\textbf{Patterns inferred by comparison}} First, the horse-racing-specific studies
+considered in this project formulate prediction at the individual-horse level,
+using a binary or regression target and sorting the resulting predictions
+afterward. None of the reviewed horse-racing studies explicitly formulates the
+complete race outcome as a learning-to-rank problem. This observation is not
+presented as a limitation stated by the authors, but as an inference from the
+reviewed corpus; evidence from related racing and ranking domains discussed in the
+\ref{sec:ejeB}, suggests that the grouping of competitors within a race may deserve
+explicit consideration. Second, only Schumaker~\cite{ejeA_schumaker2018} explicitly
+describes a chronological train/test split among the horse-racing studies reviewed.
+The remaining studies provide limited information about their temporal splitting
+procedures. Therefore, the extent to which their reported results would generalize
+to future races is difficult to assess. This observation is treated as a limitation
+of the available evidence rather than as proof that the reported experiments contain
+temporal leakage.
+
+\subsubsection*{\textbf{What this project addresses}} The present project addresses these
+methodological gaps within the limits of the available Hong Kong dataset. We
+use a chronological train/validation/test protocol to evaluate performance on
+future races and restrict predictive features to information available before
+the race, reducing the risk of temporal leakage. We also investigate the race
+as the natural grouping unit and evaluate whether a ranking-oriented
+formulation is appropriate for the prediction objective, rather than assuming
+that independent per-horse classification is sufficient. Feature
+configurations are selected and validated using the characteristics of the
+Hong Kong dataset rather than being transferred directly from another racing
+sub-type. Finally, calibration is considered alongside predictive performance
+to distinguish between ranking quality and the reliability of predicted
+probabilities
+
+\subsubsection*{\textbf{What remains out of scope}} The present project addresses these
+methodological gaps within the limits of the available Hong Kong dataset. We
+use a chronological train/validation/test protocol to evaluate performance on
+future races and restrict predictive features to information available before
+the race, reducing the risk of temporal leakage. We also investigate the race
+as the natural grouping unit and evaluate whether a ranking-oriented
+formulation is appropriate for the prediction objective, rather than assuming
+that independent per-horse classification is sufficient. Feature
+configurations are selected and validated using the characteristics of the
+Hong Kong dataset rather than being transferred directly from another racing
+sub-type. Related studies on physiological and psychological stress
+~\cite{ejeA_bartolome2016}, equestrian performance factors~\cite{ejeA_stachurska2019},
+and genetic breeding values ~\cite{ejeA_gomez2026} illustrate research directions
+that require information we do not have. Finally, calibration is considered
+alongside predictive performance to distinguish between ranking quality and the
+reliability of predicted probabilities.

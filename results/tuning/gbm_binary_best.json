@@ -8,15 +8,15 @@
   "best_cv_top1": 0.2103105415207854,
   "best_cv_top1_std": 0.014139092213838508,
   "best_params": {
-    "learning_rate": 0.14764377271189916,
+    "learning_rate": 0.14764377271189913,
     "num_leaves": 10,
     "min_child_samples": 6,
     "colsample_bytree": 0.8705803569316933,
-    "subsample": 0.7281906783998275,
-    "reg_lambda": 1.7045587123347867,
+    "subsample": 0.7281906783998274,
+    "reg_lambda": 1.7045587123347865,
     "subsample_freq": 1,
     "n_estimators": 35
   },
-  "seconds": 60.9,
-  "seconds_per_trial": 1.52
+  "seconds": 121.4,
+  "seconds_per_trial": 3.03
 }
