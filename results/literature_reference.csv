@@ -1,0 +1,3 @@
+source,metric,value,note
+"Silverman (2012), Hong Kong, 2,973 carreras",top1,0.216,"Predice el caballo mÃ¡s rÃ¡pido estimado, no el ganador oficial; periodo no especificado"
+"Chavan et al. (2024), mismo dataset de Kaggle",accuracy por fila,0.92,"Split aleatorio 80/20; el Dummy Classifier tambiÃ©n saca 92 %, no comparable con top-1"
