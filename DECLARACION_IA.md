@@ -1,3 +1,6 @@
+# Declaración de uso de herramientas de IA — Etapa 2
+
+Declaramos cómo usamos herramientas de IA en esta entrega, en qué partes, con qué propósito y qué verificamos manualmente.
 ## Jorge Gutiérrez — Modelos, métricas y evaluación
 
 **Herramienta:** Claude (Anthropic), usado como asistente de programación.
