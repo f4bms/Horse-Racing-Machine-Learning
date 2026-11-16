@@ -1,0 +1,74 @@
+% =====================================================================
+% BASELINE DE LITERATURA  ---  RESPONSABLE: INTEGRANTE 3
+% Rubrica: 3 pts. Seccion propia para que se encuentre facil.
+% La mitad de los puntos esta en la comparabilidad, no en el numero.
+% =====================================================================
+\section{Literature Baseline}
+\label{sec:baseline-lit}
+
+\subsubsection*{\textbf{Primary literature baseline}}
+The best jurisdiction-matched published result we found is Silverman~\cite{ejeA_gupta2023}:
+a hierarchical Bayesian model of running speed fit to 2,973 Hong Kong races
+(36,006 observations), reaching 21.6\% accuracy in identifying the horse that
+actually turns out fastest. We use this result as the primary literature reference
+point for our evaluation, particularly for a per-race top-1 prediction task.
+However, the value should not be interpreted as a strictly like-for-like
+performance threshold because Silverman's prediction target is the horse with the
+highest estimated running speed rather than the official race winner recorded in
+our dataset. The 21.6\% result therefore serves as a jurisdiction-matched reference
+point against which the difficulty of the prediction problem can be contextualized,
+rather than as a directly equivalent benchmark.
+
+We document the following comparability gaps rather than treating the number as a
+like-for-like target, the main differences are as follow:
+\begin{itemize}
+  \item Race count and period: 2,973 races compared with our 6,349 races.
+    The exact calendar period of Silverman's dataset is not stated in the source
+    available, so we cannot determine whether it overlaps with, precedes, or
+    follows our 1997--2005 period observation window.
+  \item Target definition: Silverman's model predicts the horse with the
+    highest estimated running speed, whereas our target is the race winner recorded
+    in our dataset; these outcomes are related but not identical, since the horse
+    estimated to be fastest may not necessarily finish first in a particular race.
+  \item Technique: Silverman uses a hierarchical Bayesian model for
+    running speed rather than a discriminative classifier or a learning-to-rank
+    model. Consequently, differences in model family, target definition, and
+    evaluation protocol prevent a direct apples-to-apples comparison without
+    reproducing both approaches on the same dataset.
+\end{itemize}
+
+We also note, without using it as a baseline, that Silverman and
+Suchard~\cite{ejeA_gupta2023} later extended this line of work toward a
+discriminative conditional logit with frailty terms; it reports a computational
+speedup (GPU vs. OpenMP by a factor of 2.68) for that model but no accuracy or AUC
+figure, so it cannot be used quantitatively here (Section~\ref{sec:ejeB}).
+
+\textbf{Secondary literature baseline)}
+Chavan et al.~\cite{ejeC_chavan2024} provide the closest dataset-matched
+reference identified in our review. The authors explicitly state that they use
+the Hong Kong horse-racing dataset available on Kaggle, consisting of the
+\texttt{races.csv} and \texttt{runs.csv} files, with 6,348 races and 79,447
+horse records. Their preprocessing merges the two files using the race
+identifier and encodes categorical variables such as venue and going before
+model training. The study evaluates a Dummy Classifier, Logistic Regression,
+Decision Tree, Random Forest, and Support Vector Machine using a random
+80/20 train-test split. Random Forest achieves the highest reported precision
+(62\%) and an accuracy of 92\%, with 52\% recall and a 51\% F1-score. The
+authors also show that the Dummy Classifier achieves the same 92\% accuracy by
+always predicting the majority \textit{not winning} class, illustrating why
+accuracy alone is insufficient for this imbalanced prediction problem.
+
+\subsubsection*{\textbf{Secondary analogs}} As additional reference
+points are provided by studies conducted in racing environments outside Hong
+Kong. Gupta and Singh~\cite{ejeA_gupta2023} evaluate Random Forest with SMOTE
+on Turf Club of India data and report 93.1\% accuracy and 97.6\% ROC-AUC.
+Davoodi and Khanteymoori~\cite{ejeA_davoodi2010} evaluate five neural-network
+algorithms on 100 races from Aqueduct and report an average accuracy of 77\%.
+Schumaker~\cite{ejeA_schumaker2018}, working with harness racing at Northfield
+Park, reports 50.4\% wagering accuracy using support vector regression. These
+results provide useful methodological context, but they are not directly
+comparable with the present study because they differ in jurisdiction, racing
+sub-type, dataset size, prediction target, and evaluation protocol. In
+particular, wagering accuracy and winner-classification accuracy should not be
+interpreted as equivalent measures. We therefore use these studies only as
+contextual evidence rather than as quantitative performance targets.

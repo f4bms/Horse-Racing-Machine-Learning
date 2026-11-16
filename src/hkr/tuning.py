@@ -37,23 +37,36 @@ def forward_chain_folds(train_df: pd.DataFrame, n_folds: int = 3):
         yield y, train_df[yr < y].reset_index(drop=True), train_df[yr == y].reset_index(drop=True)
 
 
+# Espacio de búsqueda: (tipo, mínimo, máximo, escala log). La justificación de
+# cada rango está en docs/busqueda_hiperparametros.md. Si el mejor valor queda
+# pegado a un borde, el rango se amplía (el notebook lo revisa solo).
+TREE_SPACE = {
+    "learning_rate": ("float", 0.01, 0.2, True),
+    "num_leaves": ("int", 7, 127, True),
+    "min_child_samples": ("int", 3, 300, True),
+    "colsample_bytree": ("float", 0.4, 1.0, False),
+    "subsample": ("float", 0.5, 1.0, False),
+    "reg_lambda": ("float", 1e-3, 30.0, True),
+}
+SEARCH_SPACE = {
+    "lambdamart": TREE_SPACE,
+    "gbm_binary": TREE_SPACE,
+    "logreg": {"C": ("float", 1e-5, 10.0, True)},
+    "clogit": {"alpha": ("float", 1e-6, 1.0, True)},
+}
+TREE_FIXED = {"subsample_freq": 1, "n_estimators": 2000}  # n_estimators real sale de early stopping
+
+
 def _space(trial: optuna.Trial, name: str) -> dict:
-    if name in ("lambdamart", "gbm_binary"):
-        return {
-            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
-            "num_leaves": trial.suggest_int("num_leaves", 7, 127, log=True),
-            "min_child_samples": trial.suggest_int("min_child_samples", 10, 300, log=True),
-            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.4, 1.0),
-            "subsample": trial.suggest_float("subsample", 0.5, 1.0),
-            "subsample_freq": 1,
-            "reg_lambda": trial.suggest_float("reg_lambda", 1e-3, 30.0, log=True),
-            "n_estimators": 2000,
-        }
-    if name == "logreg":
-        return {"C": trial.suggest_float("C", 1e-3, 10.0, log=True)}
-    if name == "clogit":
-        return {"alpha": trial.suggest_float("alpha", 1e-6, 1.0, log=True)}
-    raise ValueError(name)
+    if name not in SEARCH_SPACE:
+        raise ValueError(name)
+    params = {}
+    for p, (kind, lo, hi, log) in SEARCH_SPACE[name].items():
+        suggest = trial.suggest_int if kind == "int" else trial.suggest_float
+        params[p] = suggest(p, lo, hi, log=log)
+    if SEARCH_SPACE[name] is TREE_SPACE:
+        params.update(TREE_FIXED)
+    return params
 
 
 def cv_score(name, features, params, train_df, n_folds=3, early_stopping=100, seed=42):

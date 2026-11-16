@@ -7,3 +7,8 @@ data/synthetic/
 results_synth/
 results/models.joblib
 *.parquet
+
+# Notebooks de trabajo por integrante; la entrega es notebooks/Etapa2_Analisis.ipynb
+notebooks/01_datos.ipynb
+notebooks/02_modelos_y_resultados.ipynb
+notebooks/03_explicabilidad.ipynb

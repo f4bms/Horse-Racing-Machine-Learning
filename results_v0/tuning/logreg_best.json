@@ -1,0 +1,15 @@
+{
+  "model": "logreg",
+  "n_trials": 15,
+  "n_folds": 3,
+  "objective": "mean MRR (forward chaining)",
+  "best_cv_mrr": 0.3679718245260355,
+  "best_cv_mrr_std": 0.018654625517584823,
+  "best_cv_top1": 0.17461446145181567,
+  "best_cv_top1_std": 0.01823546825617693,
+  "best_params": {
+    "C": 0.040428727350273294
+  },
+  "seconds": 34.7,
+  "seconds_per_trial": 2.31
+}

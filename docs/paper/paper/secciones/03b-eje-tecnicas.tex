@@ -1,0 +1,132 @@
+% =====================================================================
+% EJE B - LAS TECNICAS DEL TRACK A  ---  RESPONSABLE: INTEGRANTE 2
+% Aqui se justifica el track CON LITERATURA, no con opinion.
+% De cada familia: fortalezas, limites y SUPUESTOS bajo los que funciona.
+% =====================================================================
+\subsection{Axis B: Techniques}
+\label{sec:ejeB}
+
+\subsubsection*{\textbf{Gradient Boosting and Random Forests versus neural networks on tabular
+data}} Tree-based ensembles are strong candidates for the present project because
+they can capture nonlinear relationships and interactions between variables
+without requiring a predefined functional form. The literature also provides
+evidence that their performance on structured tabular data can be competitive
+with, and in some settings superior to, more complex models. Hall and
+Rasheed~\cite{ejeB_hall2025} conduct a systematic review of 79 studies comparing
+tree-based machine learning (TBML), including Random Forest, XGBoost, LightGBM,
+and CatBoost, with deep learning across multiple domains. TBML methods are the
+most frequent top performers in their review and require substantially less
+training time on average, with reported differences of two to four orders of
+magnitude. However, their evidence comes primarily from time-series forecasting
+rather than horse-racing prediction, and the authors emphasize that performance
+depends on factors such as dataset characteristics, temporal structure, and
+experimental design. Therefore, the review supports considering tree-based
+methods as strong baseline candidates, but does not establish their superiority
+for the present dataset.
+
+Evidence from other structured-data domains further supports this choice while
+illustrating the importance of empirical comparison. Dumitrescu et
+al.~\cite{ejeB_dumitrescu2022} compare Random Forest, logistic regression, SVM,
+and neural networks across four credit-scoring datasets. On the Kaggle
+\textit{Give Me Some Credit} dataset, for example, Random Forest and their
+tree-augmented logistic model PLTR achieve AUC values of 0.853 and 0.857,
+respectively, compared with 0.752 for the neural network. These results show
+that a more complex model does not necessarily provide better predictive
+performance on structured data. Similarly, Yuan et al.~\cite{ejeB_yuan2025}
+review machine-learning approaches for sports-injury prediction and report
+strong results from gradient-boosted tree methods while also identifying
+settings in which simpler logistic-regression models perform comparably or
+better. Together, these studies support treating model complexity as an
+experimental variable rather than assuming that neural networks will provide
+the best performance. Within racing-related applications, Kholkine et
+al.~\cite{ejeB_kholkine2020} use XGBoost to predict road-cycling race
+performance. The authors motivate the use of XGBoost by its predictive
+performance, computational efficiency, and ability to handle missing values.
+Their application is particularly relevant to the present study because
+missing values can represent meaningful events, such as riders who did not
+finish a previous race. This illustrates why missing historical information
+should be analyzed according to its meaning before an imputation strategy is
+selected.
+
+\subsubsection*{\textbf{Ranking within a group, not independent binary classification}} A horse
+race produces a total order over a small, closed set of competitors, which is a
+ranking problem, not a set of independent win/lose labels, yet none of the
+horse-racing-specific studies we read in \ref{sec:ejeA} model it that way;
+all of them predict a per-horse label or score and then sort. This distinction is
+important when defining the prediction target: a model that estimates the
+probability of winning for each horse is different from a model whose objective
+is to predict the relative order of all horses within a race.
+
+The distinction between pointwise prediction and group-level ranking is illustrated
+by work outside and within horse racing. Peng et al.~\cite{ejeB_peng2020} formulate
+rank-position forecasting in IndyCar as the prediction of future rank positions
+within a race. Their baselines include pointwise machine-learning regression
+models such as Random Forest, SVM, and XGBoost, as well as a naive baseline
+called CurRank, which assumes that the current rank will not change. Their proposed
+RankNet explicitly models rank-position sequences and reports improvements over the
+baselines in the evaluated forecasting tasks. In particular, the authors report
+that RankNet-MLP exceeds the CurRank baseline by 7\% in Top-1 accuracy and 19\% in
+MAE for the main forecasting task. These results do not demonstrate that ranking
+models are necessarily superior for horse racing, but they show that the formulation
+of the target and the structure of the competitors can materially affect the
+prediction problem.
+
+Within horse racing, Silverman and Suchard~\cite{ejeA_gupta2023} provide a
+complementary approach through regularized conditional logistic regression with
+frailty, which incorporates dependence among competitors within the same race when
+predicting the winner. Although their model does not predict the complete finishing
+order, it demonstrates that race-level structure can be incorporated directly into
+the statistical formulation rather than treating each horse as an entirely
+independent observation.
+
+These studies suggest that the race should be considered the natural grouping unit
+when defining the prediction task and evaluating the resulting model. However, they
+do not by themselves establish which formulation is most appropriate for the
+present dataset. A binary classification formulation is suitable if the objective
+is to estimate whether an individual horse wins its race. If the objective is to
+produce an ordering of the competitors, a ranking-oriented formulation would be
+more directly aligned with the target.
+
+\subsubsection*{\textbf{Calibration and explainability}} If the final system produces probabilities
+rather than only a predicted ordering, discrimination metrics alone are
+insufficient. Vuko et al.~\cite{ejeB_vuko2025} explicitly evaluate calibration in
+addition to discrimination and argue that model selection should consider whether
+predicted probabilities correspond adequately to observed frequencies. Accordingly,
+log loss, Brier score, or an appropriate calibration analysis can complement
+ranking and classification metrics in the experimental protocol.
+
+For interpretability, Kholkine et al.~\cite{ejeB_kholkine2020} use SHAP-based
+feature attribution to inspect the contribution of predictors in their XGBoost
+model. SHAP should be regarded as an interpretability tool rather than as evidence
+that XGBoost is inherently superior. Its role in project is to analyze which
+pre-race features contribute to model predictions after a model has been validated,
+while avoiding causal interpretations from feature-attribution values alone.
+
+\subsubsection*{\textbf{Class imbalance and evaluation}} Predicting the winner of a race produces
+an intrinsically imbalanced target when each horse is represented as an individual
+observation. Gupta and Singh~\cite{ejeA_gupta2023} illustrate this problem clearly:
+only 11.8\% of their observations correspond to winners. After applying SMOTE,
+tetthey report substantially higher F1 and ROC values for Random Forest than in the
+unbalanced setting. However, synthetic oversampling must be treated carefully when
+observations belong to races, because generating synthetichorses without respecting
+race membership can distort the competitive structure. Hence, imbalance-handling
+methods such as class weighting or resampling should be evaluated experimentally
+rather than adopted solely because they improved a result in another dataset.
+
+Overall, the researches supports a candidate set centered on logistic regression
+and tree ensembles, with Random Forest and gradient boosting methods such as XGBoost
+as flexible nonlinear alternatives. KNN, Naive Bayes, AdaBoost, and Bagging can be
+used as secondary comparison models if computational and experimental scope allow.
+The final selection should be determined empirically using a common temporal
+protocol and metrics aligned with the final target definition. This approach avoids
+assuming that the most complex or most frequently reported algorithm is necessarily
+the best choice for the Hong Kong racing dataset.
+
+For these reasons, the selected track is classical machine learning over structured
+tabular data. Consequently, the relevant question is not which algorithm is
+universally the best, but which model families provide an appropriate balance
+between predictive capacity, assumptions, computational cost, and interpretability
+for the structure of horse-racing data. The literature reviewed for this project
+suggests that tree ensembles, regularized linear models, and other classical
+classifiers are viable candidates, while model choice should remain dependent on the
+target definition, feature representation, and evaluation protocol.

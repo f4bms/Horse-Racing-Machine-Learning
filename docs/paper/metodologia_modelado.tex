@@ -1,0 +1,156 @@
+% ============================================================================
+% Borrador: metodología definitiva de MODELADO Y EVALUACIÓN (Etapa 2).
+% Para pegar en el paper, después de la sección de datos/historial de Roy.
+% Escrito en inglés como el resto del artículo. Todo lo que dice coincide con
+% el código en src/hkr/ (revisar si se cambia el código).
+% Las ecuaciones (2), (3) y (5) son las del paper de la Etapa 1.
+% ============================================================================
+
+\subsection{Model Ladder (Definitive)}
+
+All models share one interface: they are fitted on the training years only
+(1997--2003) and output one score per runner, where a higher score means a
+higher chance of winning. Six rungs are trained, each adding a single idea to
+the previous one, so that any improvement can be attributed to that idea:
+
+\begin{enumerate}
+  \item \textbf{Random within the field}: a constant score; its top-1 accuracy
+        is reported as the exact expectation $\frac{1}{|R|}\sum_r 1/n_r$ rather
+        than a single random draw.
+  \item \textbf{Market favourite}: score $= \log(1/\text{odds})$ using the final
+        win odds. It is an external reference only; odds are \emph{never} used
+        as model features, so all learned models are odds-free and the market
+        is the benchmark they are measured against.
+  \item \textbf{Flat logistic regression} with $L_2$ regularisation, which also
+        absorbs the collinearity between \texttt{horse\_rating} and
+        \texttt{actual\_weight}. No class re-weighting is applied: the 8\% win
+        rate is a structural property of races (one winner per field), not a
+        sampling artefact.
+  \item \textbf{Flat gradient boosting} (LightGBM, binary objective), the
+        dominant approach in the reviewed literature.
+  \item \textbf{Conditional logit} \cite{mcfadden}:
+        $P(i \mid r) = \exp(\mathbf{x}_i^\top\boldsymbol\beta) /
+        \sum_{j \in H_r} \exp(\mathbf{x}_j^\top\boldsymbol\beta)$, fitted by
+        L-BFGS on the penalised race-level negative log-likelihood. It has no
+        intercept (it cancels within a race) and isolates the effect of forcing
+        probabilities to sum to one within each race. In dead heats the target
+        mass is split equally among the joint winners.
+  \item \textbf{LambdaMART} (LightGBM \texttt{lambdarank}), trained on the graded
+        relevance label of Eq.~(5) with gain $2^{y}-1$, i.e.\ the same gain as
+        Eq.~(2).
+\end{enumerate}
+
+\subsection{Preprocessing Inside the Pipeline}
+
+Every transformation whose parameters are estimated from data is fitted on the
+training split only and then applied unchanged to validation and test:
+
+\begin{itemize}
+  \item \emph{Linear models}: \texttt{prize} is imputed with the median of its
+        \texttt{race\_class} (never a global median, since the missing values
+        form a contiguous 1997--98 block), with an indicator
+        \texttt{prize\_unrecorded}; remaining numeric features are
+        median-imputed with missingness indicators and standardised;
+        categorical features are one-hot encoded, grouping levels with fewer
+        than 20 training rows and ignoring levels unseen in training.
+  \item \emph{Tree models}: missing values are kept as \texttt{NaN} and handled
+        natively by LightGBM (a debutant is not an average horse), and
+        categorical levels are fixed to those observed in training.
+\end{itemize}
+
+Rows are sorted chronologically with each race contiguous, and the group-size
+vector is validated against the row count before every ranker fit (Risk 2,
+Table~II). A data contract check rejects any post-race column as a feature and
+any race that spans two splits.
+
+\subsection{Hyperparameter Search}
+
+Hyperparameters are tuned with Optuna's TPE sampler (fixed seed) using
+\emph{forward-chaining} cross-validation inside the training years: train on
+1997--2000 and validate on 2001, then 1997--2001/2002, then 1997--2002/2003.
+Folds are never shuffled, and neither 2004 nor 2005 is touched. The objective
+is the mean MRR over the three folds, reported with its standard deviation. All
+baselines with hyperparameters are tuned under the same protocol (15 trials for
+the one-parameter linear models, 40 for each tree model), so the proposed model
+receives no extra tuning advantage. For tree models the number of boosting
+rounds is chosen by early stopping inside the folds and then frozen when the
+final model is refitted on all training years. Search ranges, their rationale,
+the boundary check, and the computational cost are documented in the
+repository.
+
+\subsection{Probability Calibration}
+
+Scores are mapped to win probabilities with a race-wise softmax and a single
+temperature $T$:
+\begin{equation}
+  \hat p_i = \frac{\exp(s_i/T)}{\sum_{j\in H_r}\exp(s_j/T)},
+\end{equation}
+where $T$ is fitted on the validation year (2004) by minimising the race-level
+negative log-likelihood. Because $T$ is a single monotone parameter it leaves
+every ranking metric unchanged; it only affects log loss, Brier score and
+calibration error. Probabilistic metrics are reported exclusively on these
+calibrated outputs.
+
+\subsection{Evaluation Metrics}
+
+Every metric is computed per race and then averaged over races, so that large
+fields do not dominate:
+
+\begin{itemize}
+  \item \textbf{Top-1 accuracy}: the highest-scored runner won. In the 12 dead
+        heats, picking any joint winner counts as a hit; tied scores count as
+        the expected value of a random tie-break.
+  \item \textbf{MRR}: mean reciprocal rank of the (best-ranked) winner.
+  \item \textbf{NDCG@k}, $k\in\{1,3,6\}$, as in Eqs.~(2)--(3).
+  \item \textbf{Within-race ROC-AUC} (winners vs.\ the rest of the field).
+  \item \textbf{Race log loss} $-\log \hat p_{\text{winner}}$, the
+        \textbf{race-level Brier score}
+        $\sum_{i\in H_r}(\hat p_i - t_i)^2$, and the \textbf{expected
+        calibration error} (ECE) over ten quantile bins, together with a
+        reliability diagram.
+\end{itemize}
+
+Row-level accuracy is deliberately not reported: a classifier that never
+predicts a winner already scores about 92\% (Section~III).
+
+\textbf{Uncertainty.} With roughly 790 races in the validation year, the
+standard error of top-1 accuracy is about 1.5 percentage points. Every
+headline figure is therefore reported with a 95\% bootstrap confidence
+interval obtained by resampling \emph{races} (2\,000 resamples). Differences
+against the market favourite are computed as \emph{paired} differences on the
+same resampled races; a difference is only claimed when its interval excludes
+zero.
+
+\textbf{Diagnostics.} Learning curves retrain each model on the last $k$
+training years ($k=1,\dots,7$, always the most recent ones, so the distance to
+2004 is constant) and compare training and validation MRR to diagnose
+over- and under-fitting. Errors of the proposed model are broken down by field
+size, by the winner's final odds, and by whether the model agreed with the
+market favourite; the most confident misses and the worst-ranked winners are
+inspected individually as boundary cases.
+
+\subsection{Test Protocol}
+
+The validation year (2004) is used for model comparison, temperature fitting
+and the shrinkage constant $k$ of the historical features. The test year
+(2005, 470 races) is evaluated exactly once, after all modelling decisions and
+the explainability analysis are frozen; the evaluation script refuses to run a
+second time. Because $k$ and $T$ were chosen on 2004, validation figures are
+slightly optimistic for all models alike, whereas the test figures are not.
+
+% ----------------------------------------------------------------------------
+% NOTAS PARA EL EQUIPO (borrar antes de entregar)
+% 1. Agregar a la bibliografía la referencia de McFadden (conditional logit):
+%    D. McFadden, "Conditional logit analysis of qualitative choice behavior,"
+%    in Frontiers in Econometrics, P. Zarembka, Ed. New York: Academic Press,
+%    1974, pp. 105-142.  (\cite{mcfadden})
+% 2. Cambios respecto a lo prometido en la Etapa 1 que hay que declarar:
+%    - La Tabla II prometía reportar modelos "con y sin features de cuotas".
+%      Se decidió NO usar cuotas como feature: el mercado es solo referencia.
+%      Hay que actualizar esa fila de la Tabla II.
+%    - La Ec. (4) prometía un promedio ponderado por recencia (decay). El
+%      historial de v1 usa la tasa acumulada con shrinkage, sin decay. O se
+%      implementa, o se dice explícitamente que se dejó fuera.
+%    - Tabla V: "3 implausible weights" -> ahora se anula 1 (declared_weight
+%      < 850 lb), coherente con el texto de la Sección V-D.
+% ----------------------------------------------------------------------------
