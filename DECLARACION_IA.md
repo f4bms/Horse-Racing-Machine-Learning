@@ -22,7 +22,20 @@ Declaramos cómo usamos herramientas de IA en esta entrega, en qué partes, con 
 
 ## Roy Silva — Preparación de datos e historial
 
-*(Por completar.)*
+**Herramienta:** Claude (Anthropic), usado como asistente.
+
+**En qué partes y para qué:**
+- Apoyo para crear tablas, guía en tests y comprender librerías y algoritmos con los que no estaba muy familiarizado.
+- Apoyo en la redacción de cuaderno jupyter (carga, limpieza, partición, historial y pruebas de fuga), brindó otra perspectiva en la comparativa del dataset v0 vs. v1.
+- Unión de los tres notebooks de trabajo en un solo cuaderno.
+
+**Qué hice y verifiqué yo:**
+- Construí la tabla base `dataset_v0` a partir de los CSV originales: carga, eliminación de las columnas posteriores a la carrera antes de unir las tablas, limpieza y variables objetivo.
+- Revisé los valores outliers del dataset y decidí corregirlos (dejarlos como faltantes) en lugar de solo alertar.
+- Escribí el diccionario de datos, que marca qué columnas son variables del modelo y cuáles no.
+- Definí la partición cronológica (train ≤ 2003, validación 2004, test 2005).
+- Genere las pruebas de partición y fuga, y revise que se cumplieran los tests correctamente para evitar cualquier tipo de fuga (`tests/`, `docs/particion_y_fuga.md`).
+- Construí `dataset_v1` con el historial de caballo, jinete y entrenador, calculado solo con carreras anteriores, y reemplacé los identificadores de jinete y entrenador por sus tasas.
 
 ## Fabiola Meléndez — Explicabilidad (SHAP)
 

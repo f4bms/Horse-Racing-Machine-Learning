@@ -14,7 +14,7 @@
 | `scripts/make_synthetic.py` | Datos falsos con el formato del contrato, solo para probar |
 | `scripts/antes_despues.py` | Aciertos de cada modelo antes y después de entrenar, y progreso árbol por árbol |
 | `tests/test_core.py` | Tests de métricas, gradiente del clogit, grupos y contrato |
-| `notebooks/02_modelos_y_resultados.ipynb` | Lee `results/` y muestra tablas y gráficos (no entrena) |
+| `notebooks/etapa2_cuaderno.ipynb` | Cuaderno único de la etapa: datos (Parte 1), modelos y resultados (Parte 2, lee `results/`, no entrena) y explicabilidad (Parte 3) |
 | `docs/busqueda_hiperparametros.md` | Espacio de búsqueda, protocolo, revisión de bordes y costo |
 | `docs/paper/metodologia_modelado.tex` | Borrador de la metodología de modelado para el paper |
 
@@ -53,7 +53,7 @@ python scripts/run_experiments.py --data data/processed/dataset_v1.parquet --sta
 python src/build_dataset.py --version v0
 python scripts/run_experiments.py --data data/processed/dataset_v0.parquet --stage dev --out results_v0
 
-# ver resultados: abrir notebooks/02_modelos_y_resultados.ipynb y "Run All"
+# ver resultados: abrir notebooks/etapa2_cuaderno.ipynb y "Run All"
 
 # final: evalúa test UNA vez y deja results/TEST_EVALUATED.lock
 python scripts/run_experiments.py --data data/processed/dataset_v1.parquet --stage final

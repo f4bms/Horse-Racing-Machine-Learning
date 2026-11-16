@@ -4,7 +4,7 @@ Este documento justifica cómo se ajustaron los hiperparámetros de la parte de
 modelado. Los números exactos de cada corrida (mejores valores, puntaje en
 validación cruzada, segundos) **no se copian aquí a mano**: salen de
 `results/tuning/*_best.json` y `*_trials.csv`, y el notebook
-`notebooks/02_modelos_y_resultados.ipynb` los muestra en tablas.
+`notebooks/etapa2_cuaderno.ipynb` (Parte 2) los muestra en tablas.
 
 El código está en `src/hkr/tuning.py` (`SEARCH_SPACE`).
 
@@ -20,7 +20,7 @@ que el enunciado permite explícitamente ("Optuna, grid search o random search")
   3 folds, más de 12 000 entrenamientos.
 - TPE usa las pruebas anteriores para decidir dónde probar la siguiente, así que
   llega a una zona buena con **40 pruebas**. La historia de la búsqueda (notebook,
-  sección 2) muestra si la mejora ya se había aplanado antes de la última prueba.
+  Parte 2, sección 2) muestra si la mejora ya se había aplanado antes de la última prueba.
 - Con **semilla fija** (42) la búsqueda es reproducible. Cada prueba queda
   registrada en `results/tuning/<modelo>_trials.csv`: valores probados,
   puntaje, desviación y duración.
@@ -111,7 +111,7 @@ con curvas de aprendizaje, unos 10 minutos.
 
 ## 5. Lo que la búsqueda no puede arreglar
 
-Las curvas de aprendizaje (notebook, sección 3) muestran que LambdaMART
+Las curvas de aprendizaje (notebook, Parte 2, sección 3) muestran que LambdaMART
 mantiene una brecha grande entre train y validación aun con los mejores
 hiperparámetros, mientras la regresión logística no la tiene. Eso indica que
 la limitación no está en el ajuste fino sino en la **cantidad de señal** que
