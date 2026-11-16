@@ -1,11 +1,32 @@
-# Horse Racing & Machine Learning — Parte A: datos y prevención de fuga
+# Horse Racing & Machine Learning
 
-Proyecto semestral de Inteligencia Artificial (TEC), Track A: ML clásico sobre
-datos tabulares de carreras de Hong Kong (HKJC, 1997–2005).
+Proyecto del curso de Inteligencia Artificial. Se eligió el Track A: Machine Learning clásico sobre datos tabulares. Se busca predecir el ganador de cada carrera de caballos en Hong Kong (HKJC,1997–2005) ordenando a los caballos de cada carrera, y compradando el modelo LambdaMART contra baselines, contra el favorito del mercado y contra la literatura.
 
-Esta rama (`modelado`) contiene la **Parte A** de la Etapa 2: construir la tabla
-caballo-carrera que consumen los modelos, sin información posterior a la carrera.
-La Parte B (modelos, métricas, tuning) está en la rama `modelos-y-evaluacion`.
+- **Dataset:** dataset de Kaggle [`gdaley/hkracing`](https://www.kaggle.com/datasets/gdaley/hkracing/data): 79 447 filas (un caballo en una carrera) y 6 348 carreras.
+- **Cuaderno principal:** el cuaderno [`notebooks/Etapa2_Analisis.ipynb`](notebooks/Etapa2_Analisis.ipynb), cuenta con el ciclo completo en tres partes: datos, modelos y resultados, y explicabilidad.
+- **Declaración de uso de IA:** [`DECLARACION_IA.md`](DECLARACION_IA.md).
+
+| Parte | Responsable | Código |
+|---|---|---|
+| Datos, limpieza, historial y pruebas de fuga | Roy Silva | `src/*.py`, `tests/test_cleaning_unit.py`, `tests/test_leakage_*.py`, `tests/test_dataset_v1.py` |
+| Modelos, métricas, calibración y evaluación | Jorge Gutiérrez | `src/hkr/`, `scripts/`, `tests/test_core.py` |
+| Explicabilidad (SHAP), documentación y analisis y revisión de resultados | Fabiola Meléndez | Parte 3 del cuaderno |
+
+---
+
+## Resultado principal
+
+| Modelo | Acierta al ganador (top-1) | IC 95 % | Diferencia contra el mercado [IC 95 %] |
+|---|---|---|---|
+| Azar (1/n) | 8.1 % | 8.0–8.3 | −20.9 [−25.2, −16.8] |
+| **Favorito del mercado** | **29.0 %** | 24.9–33.3 | — |
+| Regresión logística | 22.1 % | 18.5–25.7 | −6.9 [−10.9, −3.1] |
+| GBM binario | 19.1 % | 15.7–22.8 | −9.9 [−13.8, −5.8] |
+| Logit condicional | 21.9 % | 18.3–25.7 | −7.1 [−11.1, −3.4] |
+| LambdaMART (propuesto) | 21.5 % | 17.9–25.1 | −7.6 [−11.5, −3.6] |
+| Silverman (2012), literatura | 21.6 % | — | no comparable directamente |
+
+Los modelos que aprenden casi triplican al azar y alcanzan al baseline de literatura, peroninguno le gana al mercado, y el modelo simple de logística queda a la par de LambdaMART. El análisis completo se puede encontrar de manera más amplia en la Sección 2 del cuaderno.
 
 ---
 
@@ -13,173 +34,308 @@ La Parte B (modelos, métricas, tuning) está en la rama `modelos-y-evaluacion`.
 
 ```text
 .
+├── configs/experiment.json   # semilla, modelos, pruebas de Optuna y referencias de literatura
 ├── data/
-│   ├── raw/                # races.csv y runs.csv originales
-│   └── processed/          # salida: dataset_v0 y dataset_v1 (.parquet y .csv)
+│   ├── raw/                  # races.csv y runs.csv originales (Kaggle)
+│   └── processed/            # salida: dataset_v0 y dataset_v1 (no se sube al repo)
 ├── docs/
-│   ├── diccionario_dataset_v0.md / .csv   # diccionarios generados (no editar a mano)
-│   ├── diccionario_dataset_v1.md / .csv
-│   ├── seleccion_k_dataset_v1.csv         # búsqueda de k del shrinkage (generada)
-│   ├── historial_v1.md                    # features históricas de v1: definición, k y controles
-│   └── particion_y_fuga.md                # partición, variables descartadas por fuga y su verificación
+│   ├── particion_y_fuga.md            # partición, variables descartadas por fuga y su verificación
+│   ├── historial_v1.md                # features históricas de v1: definición, k y controles
+│   ├── busqueda_hiperparametros.md    # espacio de búsqueda, protocolo, bordes y costo
+│   ├── diccionario_dataset_v0.md/.csv # diccionarios generados (no editar a mano)
+│   ├── diccionario_dataset_v1.md/.csv
+│   ├── seleccion_k_dataset_v1.csv     # búsqueda de k del shrinkage (generada)
+│   └── paper/                         # artículo (LaTeX) y metodología de modelado
+├── instrucciones/            # enunciados del proyecto
+├── notebooks/
+│   └── Etapa2_Analisis.ipynb # cuaderno único de la Etapa 2
+├── results/                  # salida de scripts/run_experiments.py con dataset_v1
+├── results_v0/               # lo mismo con dataset_v0 (sin historial), para comparar
+├── scripts/
+│   ├── run_experiments.py    # tunea, entrena, calibra y evalúa (--stage dev / final)
+│   ├── antes_despues.py      # aciertos de cada modelo antes y después de entrenar
+│   └── make_synthetic.py     # datos falsos con el formato de la tabla, solo para probar
 ├── src/
-│   ├── build_dataset.py    # genera data/processed/dataset_v0 o dataset_v1
-│   ├── cleaning.py         # carga, borrado POST, prepare, targets, split
-│   ├── history.py          # features históricas de v1 (tasas con shrinkage, días, sin historial)
-│   └── data_dictionary.py  # genera el diccionario de datos en docs/
-├── tests/
-│   ├── conftest.py            # construye v0 y v1 desde data/raw una vez por sesión
-│   ├── test_cleaning_unit.py  # salvaguardas de cleaning.py con datos mock
-│   ├── test_leakage_v0.py     # tests contra fuga sobre la tabla real
-│   ├── test_dataset_v1.py     # v1 = v0 + historial, ajuste sin mirar test
-│   └── test_leakage_checks.py # verificación "solo PRE" para features históricas
-├── pytest.ini        # ejecuta lo que esta en tests/, e importa desde src/
-└── requirements.txt  # libreria pip usadas para ejecutar el código
+│   ├── build_dataset.py      # genera data/processed/dataset_v0 o dataset_v1
+│   ├── cleaning.py           # carga, borrado de columnas POST, preparación, targets y partición
+│   ├── history.py            # features históricas de v1 (tasas con shrinkage, días, sin historial)
+│   ├── data_dictionary.py    # genera el diccionario de datos en docs/
+│   └── hkr/                  # modelos, métricas, calibración, tuning y análisis (ver abajo)
+├── tests/                    # 89 pruebas: limpieza, fuga, historial, métricas y contrato
+├── DECLARACION_IA.md
+├── pytest.ini
+└── requirements.txt
 ```
 
-## Cómo ejecutarlo
+---
 
-1. **Datos crudos.** Si hace falta, descargar `races.csv` y `runs.csv` de
-   <https://www.kaggle.com/datasets/gdaley/hkracing/data> y copiarlos a `data/raw/`.
+## Ejecución
 
-2. **Entorno** (Python ≥ 3.10):
+**1. Entorno** (Python ≥ 3.10):
 
-   ```bash
-   uv venv && uv pip install -r requirements.txt
-   # o bien: python -m venv .venv && .venv/bin/pip install -r requirements.txt
-   ```
+```bash
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-3. **Generar la tabla:**
+**2. Datos crudos.** `data/raw/races.csv` y `data/raw/runs.csv`. Se pueden encontrar también en:  [Kaggle](https://www.kaggle.com/datasets/gdaley/hkracing/data).
 
-   ```bash
-   .venv/bin/python src/build_dataset.py --csv
-   ```
+**3. Pruebas** (no hace falta generar la tabla antes: la reconstruyen desde `data/raw`):
 
-   Opciones: `--version` (`v0` por defecto, o `v1` con historial), `--raw-dir` (por defecto `data/raw`), `--out` (por defecto `data/processed/dataset_<version>.parquet`), `--csv` (guarda también una copia `.csv`). <br>
-   Para generar la tabla con historial:
+```bash
+python -m pytest -q
+```
 
-   ```bash
-   .venv/bin/python src/build_dataset.py --version v1 --csv
-   ```
+**4. Generar las tablas:**
 
-   Además imprime el prior y los k elegidos, y guarda la búsqueda de k en:
-   `docs/seleccion_k_dataset_v1.csv`. Detalle en [`docs/historial_v1.md`](docs/historial_v1.md).
+```bash
+python src/build_dataset.py --version v0
+python src/build_dataset.py --version v1
+```
 
-   El script imprime filas, carreras, conteo por split y celdas que vale la pena revisar
-   por columna. Si alguna validación falla, se detiene con `DataError`.
+Opciones: `--raw-dir` (por defecto `data/raw`), `--out` (por defecto
+`data/processed/dataset_<version>.parquet`), `--csv` (guarda también una copia `.csv`).
+El script imprime filas, carreras y conteo por partición, y se detiene con `DataError` si
+alguna validación falla. Con `v1` imprime además el prior y los *k* elegidos, y guarda la
+búsqueda de *k* en `docs/seleccion_k_dataset_v1.csv`.
 
-   Salida esperada:
+**5. Entrenamiento**:
 
-   | split | regla | filas | carreras | período |
-   |---|---|---|---|---|
-   | train | año ≤ 2003 | 63 668 | 5 089 | 1997-06-02 → 2003-12-31 |
-   | val | año 2004 | 9 902 | 789 | 2004-01-04 → 2004-12-29 |
-   | test | año 2005 | 5 877 | 470 | 2005-01-01 → 2005-08-28 |
-   | **Total** | | **79 447** | **6 348** | **1997-06-02 → 2005-08-28** |
+```bash
+python scripts/run_experiments.py --data data/processed/dataset_v1.parquet --stage dev
+# opcional, para la comparación sin historial:
+python scripts/run_experiments.py --data data/processed/dataset_v0.parquet --stage dev --out results_v0
+```
 
-4. **Generar el diccionario de datos** (después de regenerar la tabla):
+Con validación cruzada dentro de train, reentrena con todo train, calibra en
+validación (2004) y guarda todo en `results/`, incluido `results/models.joblib`. Al final imprime la tabla de validación (`logreg 0.2345`,
+`market 0.3308`). LambdaMART y GBM pueden variar unas décimas entre computadoras.
 
-   ```bash
-   .venv/bin/python src/data_dictionary.py
-   .venv/bin/python src/data_dictionary.py --data data/processed/dataset_v1.parquet
-   ```
+**6. Antes y después del entrenamiento** (opcional):
 
-   Opciones: `--data` (por defecto `data/processed/dataset_v0.parquet`) y `--out-dir`
-   (por defecto `docs`). Escribe `docs/diccionario_<tabla>.md` y `.csv`, con rol, tipo,
-   faltantes (total y por split), valores únicos, rango o categorías y descripción de cada
-   columna. El rol sale de `NON_FEATURES` en `data_dictionary.py`: todo lo que no está ahí
-   es feature. Las descripciones salen de `DESCRIPCIONES` en el mismo archivo; una columna
-   sin descripción aparece como "sin descripción" y el script avisa en consola.
+```bash
+python scripts/antes_despues.py
+```
 
-5. **Correr los tests contra fuga:**
+**7. Ver todo:** abrir `notebooks/Etapa2_Analisis.ipynb`, elegir el kernel de `.venv` y
+darle **Run All**. Las Partes 1 y 2 solo necesitan `data/raw` y lo que ya está en
+`results/`; la Parte 3 (SHAP) necesita `results/models.joblib`, es decir, el paso 5.
 
-   ```bash
-   .venv/bin/python -m pytest
-   ```
+**Test 2005: ya se evaluó.** `--stage final` evalúa el test una sola vez y deja
+`results/TEST_EVALUATED.lock`; con ese archivo, el script se niega a correr de nuevo.
+Los resultados están en `results/test_metrics.csv`. No usar `--force`.
 
-   No hace falta generar la tabla antes: los tests la reconstruyen desde
-   `data/raw` con el mismo código. Los unitarios usan datos sintéticos y corren
-   aunque falten los CSV raw. Qué verifica cada test y por qué está en
-   [`docs/particion_y_fuga.md`](docs/particion_y_fuga.md)
+Para probar el código sin la tabla real: `python scripts/make_synthetic.py` y usar
+`data/synthetic/dataset_synth.parquet`.
 
-## Cómo usar la tabla
+---
 
-Una fila por caballo en cada carrera, ordenada por `date`, `race_id`, `horse_no`
-(las filas de una carrera quedan contiguas).
+## Parte 1 · Datos y prevención de fuga
+
+### Tabla 
+
+Una fila por caballo en cada carrera, ordenada por `date`, `race_id`, `horse_no` (las
+filas de una carrera quedan contiguas). La partición es cronológica por año y se puede ver de esta manera:
+
+| split | regla | filas | carreras | período |
+|---|---|---|---|---|
+| train | año ≤ 2003 | 63 668 | 5 089 | 1997-06-02 → 2003-12-31 |
+| val | año 2004 | 9 902 | 789 | 2004-01-04 → 2004-12-29 |
+| test | año 2005 | 5 877 | 470 | 2005-01-01 → 2005-08-28 |
+| **Total** | | **79 447** | **6 348** | **1997-06-02 → 2005-08-28** |
 
 | Columna | Uso |
 |---|---|
 | `race_id`, `date`, `split` | identificación y partición |
 | `won` | 1 si ganó; en empate por el primer lugar hay dos 1 (12 carreras) |
 | `y_rel` | 3 ganó · 2 llegó 2.º–3.º · 1 llegó 4.º–6.º · 0 el resto |
-| `win_odds` | cuota final; solo para el baseline de mercado, nunca como feature |
-| `horse_id`, `horse_no`, `race_no`, `result`, `place_odds` | se conservan, pero no son features |
-| todo lo demás | features (19 en v0; 22 en v1: + 5 de historial + `gear_any` − `jockey_id`, `trainer_id` y `horse_gear`) |
+| `win_odds` | cuota final |
+| `horse_id`, `horse_no`, `race_no`, `result`, `place_odds` | 
+| todo lo demás | features: 19 en v0; 22 en v1 |
 
-Features de v0: `horse_age`, `horse_country`, `horse_type`, `horse_rating`,
-`horse_gear`, `declared_weight`, `actual_weight`, `draw`, `trainer_id`,
-`jockey_id`, `venue`, `config`, `surface`, `distance`, `going`,
-`horse_ratings`, `prize`, `race_class`, `field_size`.
+- **v0:** `horse_age`, `horse_country`, `horse_type`, `horse_rating`, `horse_gear`,
+  `declared_weight`, `actual_weight`, `draw`, `trainer_id`, `jockey_id`, `venue`,
+  `config`, `surface`, `distance`, `going`, `horse_ratings`, `prize`, `race_class`,
+  `field_size`.
+- **v1:** v0 + `horse_win_rate`, `jockey_win_rate`, `trainer_win_rate`,
+  `horse_days_since_last`, `horse_no_history` y `gear_any`, sin `jockey_id`,
+  `trainer_id` ni `horse_gear` (las tasas y `gear_any` los reemplazan).
 
-## Qué hace el código y por qué
+El diccionario completo de cada tabla (tipo, faltantes por split, rango y descripción)
+se puede encontrar en `docs/diccionario_dataset_v0.md` y `docs/diccionario_dataset_v1.md`. Se regenera utilizando `python src/data_dictionary.py --data data/processed/dataset_v1.parquet`.
+
+### Qué hace el código y por qué
 
 **1. Borrado POST antes del join.** Cada CSV se limpia al leerse (`load_races`,
 `load_runs`), antes de unirlos por `race_id`. Se eliminan `finish_time`,
-`lengths_behind`, `position_sec*`, `behind_sec*`, `time*`, `sec_time*`,
-`*dividend*` y `*combination*`. Es especialmente importante en `races.csv`,
-porque sin este paso el join copiaría dividendos y combinaciones ganadoras a
-cada corredor (`win_combination1` es literalmente el número del ganador). El código
-verifica que no quede ninguna antes y después del merge.
+`lengths_behind`, `position_sec*`, `behind_sec*`, `time*`, `sec_time*`, `*dividend*` y
+`*combination*`. Es especialmente importante en `races.csv`: sin este paso, el join
+copiaría dividendos y combinaciones ganadoras a cada corredor (`win_combination1` es
+literalmente el número del ganador). El código verifica que no quede ninguna antes y
+después del merge. `result` se conserva solo para construir los targets.
 
-`result` se conserva solo para construir los targets y nunca entra como
-variable al modelo. La columna original `won` se descarta y se recalcula.
+**2. Preparación.** No se borran filas: quitar un corredor cambiaría el tamaño del
+campo. Los valores imposibles se anulan (*NaN*):
 
-**2. Preparación.** No se borran filas: quitar un corredor cambiaría el
-tamaño del campo y la estructura de un ganador por carrera. Los valores
-imposibles se anulan (*NaN*).
+- `declared_weight < 850` (1 fila): 693 lb en la carrera 2287, de un caballo cuyo peso
+  medio en sus demás carreras es 1101 lb.
+- `draw > 14` (1 fila): Hong Kong tiene como máximo 14 cajones.
+- Que `draw` sea mayor que el número de corredores no es un error: si un caballo se
+  retira, los demás conservan su cajón (~400 filas).
 
-- Se agrega `field_size`: cuántos corredores tiene cada carrera.
-- `jockey_id` y `trainer_id` se guardan como texto: son categorías, no
-  cantidades.
-- Valores fuera de rango que se anulan a *NaN*:
-  - `declared_weight <850` (1 fila): 693 lb en la carrera 2287, caballo 2931,
-    cuyo peso medio en sus demás carreras es 1101 lb. Los siguientes valores
-    más bajos (896 y 898 lb) son coherentes con el historial de su caballo y
-    se conservan.
-  - `draw > 14` (1 fila): draw 15 en la carrera 5188 (`horse_no` 3). Hong Kong
-    tiene como máximo 14 cajones. Por eso `draw` queda como *NaN*.
-- Que `draw` sea mayor que el número de corredores no es un error: si un
-  caballo se retira, los demás conservan el cajón asignado (pasa en ~400 filas).
-- `horse_gear = "--"` significa "sin equipo" y se conserva como categoría
-  válida (por ahora).
+Además se agrega `field_size` (corredores por carrera), y `jockey_id` y `trainer_id` se
+guardan como texto porque son categorías.
 
-**3. Targets y partición.** `won` y `y_rel` se calculan desde `result`
-(`won` coincide al 100 % con la columna original). La partición es
-cronológica por año, así que ninguna carrera queda en dos splits. El código lo
-verifica, junto con `max(fecha train) < min(fecha val) < min(fecha test)` y que
-toda carrera tenga al menos un ganador.
+**3. Targets y partición.** `won` y `y_rel` se calculan desde `result`. La partición es
+cronológica por año, así que ninguna carrera queda en dos splits; el código lo verifica,
+junto con `max(fecha train) < min(fecha val) < min(fecha test)`.
 
-### Observaciones de los datos (posibles consideraciones)
+**4. Historial (v1).** Las tasas de victoria previas de caballo, jinete y entrenador usan
+solo carreras de fechas anteriores (las del mismo día tampoco cuentan), con
+*shrinkage* hacia la tasa de train: `tasa = (victorias + k · prior) / (carreras + k)`.
+*k* se elige por entidad en validación, nunca en test. Más detalles en [`docs/historial_v1.md`](docs/historial_v1.md).
 
-- `prize` falta en 462 carreras (5 849 filas), todas entre 1997-07-20 y
-  1998-03-18. Es un bloque por período de recolección, no aleatorio.
-- La carrera `3676` (2002-02-20) tiene 11 filas, pero sus posiciones llegan
-  a 12: falta el corredor que llegó 8.º. Ganador y targets no se ven afectados.
-- Hay 1 fila con `draw > 14`, por encima del número de cajones; podría ser
-  un error de registro o se retiro el competidor, por eso se cambio a *NaN*.
-- `race_class` es un código (0, 6, 11–13 son carreras especiales/de grupo
-  según `horse_ratings = "G"`), así que no es una escala ordenada.
-- `win_odds` está limitado a 99.0.
-- La partición por año calendario corta a mitad de temporada (la temporada de
-  HK va de septiembre a julio), y test (2005) es un año incompleto.
+**5. Pruebas contra fuga.** `tests/` comprueba que no quede ninguna columna POST, que la
+partición sea correcta y que, al alterar resultados a partir de una fecha, las features
+anteriores no cambien. Las pruebas de fuga más a detalle se pueden encontrar en: 
+[`docs/particion_y_fuga.md`](docs/particion_y_fuga.md).
+
+### Observaciones de los datos
+
+- `prize` falta en 462 carreras (5 849 filas), todas entre 1997-07-20 y 1998-03-18: es un
+  bloque por período de recolección, no aleatorio. Los modelos lineales lo imputan con la
+  mediana de su `race_class` en train.
+- La carrera 3676 tiene 11 filas pero sus posiciones llegan a 12: falta el corredor que
+  llegó 8.º. Ganador y targets no se ven afectados.
+- `race_class` es un código (0, 6 y 11–13 son carreras especiales o de grupo), no una
+  escala ordenada.
+- `win_odds` está limitado a 99.
+- La partición por año calendario corta a mitad de temporada (la de Hong Kong va de
+  septiembre a julio), y el test (2005) es un año incompleto.
 
 ---
 
-### Pendiente
-- Pipeline (scikit-learn: imputación, escalado y codificación, ajustado solo con train)
-<!-- Completar: archivo del pipeline y qué transforma cada rama
-     (numéricas / categóricas). -->
+## Parte 2 · Modelos, métricas y calibración
 
-La justificación de la partición y de las variables descartadas por fuga está en
-[`docs/particion_y_fuga.md`](docs/particion_y_fuga.md). Las features históricas de v1 (definición, k del shrinkage y aspectos a considerar) están en [`docs/historial_v1.md`](docs/historial_v1.md).
+### Código
 
+| Archivo | Qué hace |
+|---|---|
+| `src/hkr/data.py` | Carga la tabla y valida el contrato (splits, carreras contiguas, columnas prohibidas) |
+| `src/hkr/preprocess.py` | Imputación, escalado y one-hot dentro de pipelines ajustados solo con train |
+| `src/hkr/models.py` | La escalera: random, market, logreg, gbm_binary, clogit, lambdamart |
+| `src/hkr/metrics.py` | Top-1, MRR, NDCG@k, AUC intra-carrera, log loss, Brier, ECE, confiabilidad |
+| `src/hkr/calibration.py` | Softmax por carrera + temperatura ajustada en val |
+| `src/hkr/tuning.py` | Optuna con *forward chaining* dentro de train |
+| `src/hkr/analysis.py` | Curvas de aprendizaje y análisis de errores |
+
+### La escalera de modelos
+
+Cada escalón agrega una sola idea respecto al anterior:
+
+| Modelo | Qué aísla |
+|---|---|
+| `random` | piso: ¿el modelo aprende algo? |
+| `market` | referencia externa (cuotas finales); nunca es feature |
+| `logreg` | baseline razonable: gana / no gana, fila por fila |
+| `gbm_binary` | lo mismo con no linealidad (LightGBM) |
+| `clogit` | + las probabilidades de una carrera suman 1 (logit condicional de McFadden) |
+| `lambdamart` | + aprende del orden completo de llegada (modelo propuesto) |
+
+### Contrato de la tabla
+
+`src/hkr/data.py` exige `race_id`, `date`, `split`, `won`, `y_rel` y `win_odds`. Toda
+columna que no esté en `RESERVED` se toma como feature. Si aparece algo como
+`finish_time`, `position_sec1` o `*_dividend`, el script se detiene con error. Para fijar
+la lista de features a mano, utilizar `"features": [...]` en `configs/experiment.json`.
+
+### Decisiones documentadas
+
+**Métricas por carrera, no por fila.** El campo va de 4 a 14 caballos; promediar por fila
+pesa más las carreras grandes, y la pregunta es quién gana la carrera. *Accuracy* por
+fila está descartada: no predecir nunca un ganador da 92 %.
+
+**MRR como objetivo del tuning**, no top-1: top-1 es 0/1 por carrera y es ruidoso; MRR
+también premia dejar al ganador segundo o tercero.
+
+**Forward chaining dentro de train** (valida en 2001, 2002 y 2003). Un k-fold barajado
+dejaría que carreras futuras informen al pasado. Val (2004) no se usa para tunear, así
+queda limpia para comparar modelos y calibrar. Detalle en
+[`docs/busqueda_hiperparametros.md`](docs/busqueda_hiperparametros.md).
+
+**Todos los modelos con hiperparámetros se tunean igual que LambdaMART.** Tunear solo el
+modelo propuesto inflaría su ventaja.
+
+**El número de árboles sale de *early stopping* en los folds**, y el modelo final se
+reentrena con ese número fijo. Así val no se usa para *early stopping*.
+
+**Calibración por temperatura en val.** Un solo parámetro: no cambia el orden (top-1, MRR
+y NDCG quedan idénticos), solo log loss, Brier y ECE. LambdaMART no da probabilidades;
+sin este paso su log loss no significa nada.
+
+**Logit condicional sin intercepto:** cualquier constante se cancela dentro de la carrera.
+
+**Sin class weighting ni SMOTE:** el desbalance es estructural, hay solamente un ganador por carrera y la normalización por carrera lo absorbe.
+
+**El azar reporta el top-1 esperado exacto** promedio de 1/n no una tirada.
+
+**Intervalos de confianza por bootstrap de carreras.** Con ~770 carreras por año, el
+error estándar de top-1 es ~1.5 puntos. Cada fila trae `top1_lo/hi` (IC 95 %) y la
+diferencia pareada contra el mercado con su IC. Si el IC de la diferencia incluye 0, no
+se puede afirmar que el modelo le gana al mercado.
+
+### Tablas e información importante en `results/`
+
+- `val_metrics.csv`, `test_metrics.csv`: la tabla comparativa
+- `tuning/*_trials.csv`, `tuning/*_best.json`: espacio, todas las pruebas y el tiempo
+- `learning_curve_*.csv`: train contra val al variar los años de historia
+- `val_errors_*`: top-1 por tamaño de campo, por cuota del ganador y según coincida o no con el favorito
+- `val_confident_misses_*`, `val_missed_winners_*`: casos límite para discutir
+- `val_reliability_*`, `test_reliability_*`: datos del *reliability diagram*
+- `literature_reference.csv`: Silverman y Chavan, con la nota de comparabilidad
+- `shap_importance_lambdamart.csv` y `figures/shap_*.png`: explicabilidad (Parte 3)
+
+### ¿Cuánto aporta el historial? (validación 2004, top-1)
+
+| Modelo | v0 (sin historial) | v1 (con historial) |
+|---|---|---|
+| Regresión logística | 18.4 % | 23.4 % |
+| Logit condicional | 18.4 % | 22.8 % |
+| GBM binario | 18.6 % | 19.8 % |
+| LambdaMART | 21.4 % | 20.3 % |
+
+El historial ayuda mucho a los modelos simples y casi nada a LambdaMART, que en v0 ya
+sacaba esa información de los códigos de jinete y entrenador.
+
+---
+
+## Parte 3 · Explicabilidad (SHAP)
+
+SHAP reparte el puntaje que LambdaMART da a cada caballo entre sus 22 variables. Se usa
+el SHAP exacto para árboles que trae LightGBM (`pred_contrib=True`), sobre validación
+2004. Se reporta por familia de variables y por variable, nunca por jinete o entrenador
+individual. Hallazgos principales:
+
+- **El historial domina** (≈ 46 % de la importancia) y `jockey_win_rate` es la variable
+  número uno (≈ 21 %).
+- **Las direcciones tienen sentido:** cajón cerca del riel ayuda; mucho tiempo sin correr
+  y más edad restan.
+- **No hay señales de fuga:** las variables de la carrera (premio, clase, distancia…)
+  suman ≈ 7.5 %.
+- **`gear_any` tiene drift:** el registro de equipo pasa de 0 % de los caballos en 1997
+  a ≈ 80 % en 2004–2005, y la ventaja de llevarlo desaparece. Quitarla no da una mejora
+  significativa por lo que el equipo decidió mantenerla.
+
+---
+
+## Documentación
+
+| Documento | Contenido |
+|---|---|
+| [`notebooks/Etapa2_Analisis.ipynb`](notebooks/Etapa2_Analisis.ipynb) | Cuaderno único de la etapa |
+| [`docs/particion_y_fuga.md`](docs/particion_y_fuga.md) | Partición, variables descartadas por fuga y pruebas |
+| [`docs/historial_v1.md`](docs/historial_v1.md) | Features históricas, *shrinkage* y elección de *k* |
+| [`docs/busqueda_hiperparametros.md`](docs/busqueda_hiperparametros.md) | Espacio de búsqueda, protocolo y costo |
+| [`docs/paper/`](docs/paper/) | Artículo en LaTeX |
+| [`DECLARACION_IA.md`](DECLARACION_IA.md) | Declaración de uso de IA |

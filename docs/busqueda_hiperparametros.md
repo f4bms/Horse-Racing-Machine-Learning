@@ -4,7 +4,7 @@ Este documento justifica cómo se ajustaron los hiperparámetros de la parte de
 modelado. Los números exactos de cada corrida (mejores valores, puntaje en
 validación cruzada, segundos) **no se copian aquí a mano**: salen de
 `results/tuning/*_best.json` y `*_trials.csv`, y el notebook
-`notebooks/etapa2_cuaderno.ipynb` (Parte 2) los muestra en tablas.
+`notebooks/Etapa2_Analisis.ipynb` (Parte 2) los muestra en tablas.
 
 El código está en `src/hkr/tuning.py` (`SEARCH_SPACE`).
 
