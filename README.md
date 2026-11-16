@@ -317,14 +317,14 @@ el SHAP exacto para árboles que trae LightGBM (`pred_contrib=True`), sobre vali
 2004. Se reporta por familia de variables y por variable, nunca por jinete o entrenador
 individual. Hallazgos principales:
 
-- **El historial domina** (≈ 46 % de la importancia) y `jockey_win_rate` es la variable
-  número uno (≈ 21 %).
+- **El historial domina** (aprox. 46 % de la importancia) y `jockey_win_rate` es la variable
+  número uno (aprox. 21 %).
 - **Las direcciones tienen sentido:** cajón cerca del riel ayuda; mucho tiempo sin correr
   y más edad restan.
 - **No hay señales de fuga:** las variables de la carrera (premio, clase, distancia…)
-  suman ≈ 7.5 %.
+  suman aprox. 7.5 %.
 - **`gear_any` tiene drift:** el registro de equipo pasa de 0 % de los caballos en 1997
-  a ≈ 80 % en 2004–2005, y la ventaja de llevarlo desaparece. Quitarla no da una mejora
+  a aprox. 80 % en 2004–2005, y la ventaja de llevarlo desaparece. Quitarla no da una mejora
   significativa por lo que el equipo decidió mantenerla.
 
 ---

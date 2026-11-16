@@ -55,7 +55,7 @@ que el enunciado permite explícitamente ("Optuna, grid search o random search")
 | Hiperparámetro | Rango | Escala | Por qué |
 |---|---|---|---|
 | `learning_rate` | 0.01 – 0.2 | log | Por debajo de 0.01 necesita miles de árboles; por encima de 0.2 el boosting se vuelve inestable. Escala log porque importa la proporción, no la diferencia |
-| `num_leaves` | 7 – 127 | log | Controla la complejidad de cada árbol. 7 hojas ≈ profundidad 3; 127 ≈ profundidad 7. Con ~22 features no hace falta más |
+| `num_leaves` | 7 – 127 | log | Controla la complejidad de cada árbol. 7 hojas aprox. profundidad 3; 127 aprox. profundidad 7. Con ~22 features no hace falta más |
 | `min_child_samples` | 3 – 300 | log | Mínimo de filas por hoja: el freno principal contra el sobreajuste. El campo promedio tiene ~12 caballos, así que 300 equivale a ~25 carreras |
 | `colsample_bytree` | 0.4 – 1.0 | lineal | Fracción de features por árbol; menos de 0.4 dejaría fuera demasiadas con solo ~22 |
 | `subsample` | 0.5 – 1.0 | lineal | Fracción de filas por árbol (*bagging* dentro del boosting) |
@@ -78,15 +78,15 @@ El notebook revisa automáticamente si algún hiperparámetro elegido quedó en 
 5 % extremo de su rango, porque un óptimo pegado al borde puede indicar que el
 mejor valor está afuera.
 
-- **`logreg`, `C`:** en la primera corrida eligió `C ≈ 0.00102`, pegado al
+- **`logreg`, `C`:** en la primera corrida eligió `C aprox. 0.00102`, pegado al
   mínimo original (0.001). Se amplió el rango a 10⁻⁵ y, al volver a correr,
-  eligió `C ≈ 0.002`, ya en el interior. Corregido.
+  eligió `C aprox. 0.002`, ya en el interior. Corregido.
 - **`lambdamart` y `gbm_binary`, `min_child_samples`:** con el mínimo original
   (10) quedaron cerca del borde. Se bajó el mínimo a 3 y volvieron a elegir
   valores bajos (3 y 6). Aquí **no se siguió ampliando**, porque la búsqueda
   muestra que este hiperparámetro es plano: en LambdaMART, el mejor MRR con
   hojas de 3–10 filas (0.406) y con hojas de 30–100 filas (0.405) difieren en
-  0.001, diez veces menos que la desviación entre folds (≈ 0.014). El modelo
+  0.001, diez veces menos que la desviación entre folds (aprox. 0.014). El modelo
   se regulariza por otras vías (árboles chicos, 8–13 hojas, y *early
   stopping*), así que el tamaño mínimo de hoja casi no cambia el resultado. El
   mínimo absoluto posible es 1, muy cerca de 3.
