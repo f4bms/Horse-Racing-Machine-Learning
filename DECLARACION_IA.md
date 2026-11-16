@@ -39,4 +39,14 @@ Declaramos cómo usamos herramientas de IA en esta entrega, en qué partes, con 
 
 ## Fabiola Meléndez — Explicabilidad (SHAP)
 
-*(Por completar.)*
+**Herramienta:** Claude (Anthropic), usado como asistente.
+
+**En qué partes y para qué:**
+- Mejora de redacción y claridad de los notebooks de análisis SHAP y de la documentación de la etapa 2.
+- Identificación de puntos faltantes en la explicación de los resultados y sugerencias de visualizaciones para mejorar la comprensión de los hallazgos.
+
+**Qué hice y verifiqué yo:**
+- Analicé los resultados de SHAP para los modelos entrenados, identificando las variables más influyentes y cómo afectan la predicción de los resultados de las carreras.
+- Verifiqué que los hallazgos de SHAP fueran consistentes con la lógica del problema.
+- Documenté los hallazgos y las decisiones tomadas.
+- Identifiqué la problemática de `gear_any` y su efecto en el modelo, y propuse soluciones para mitigar su impacto.
